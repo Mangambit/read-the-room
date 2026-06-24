@@ -30,6 +30,18 @@ export const SAMPLES: DemoSample[] = [
       meaning:
         "They're annoyed you missed the deadline and are reminding you they already told you once. The 'extra support' offer is a polite jab, not a genuine offer of help.",
       tones: ["passive-aggressive", "frustrated"],
+      tells: [
+        {
+          quote: "Per my last email",
+          reads:
+            "Opening with 'per my last email' is a pointed reminder that they already told you once — a flag of irritation.",
+        },
+        {
+          quote: "extra support managing deadlines",
+          reads:
+            "The 'extra support' line is a polite jab at your reliability, not a genuine offer of help.",
+        },
+      ],
       confidence: 88,
       upset: "yes",
       upsetReason:
@@ -55,6 +67,13 @@ export const SAMPLES: DemoSample[] = [
       meaning:
         "They want to talk fairly soon. The casual wording doesn't tell you whether it's good or bad news — but 'when you get a sec' usually means now-ish, not whenever.",
       tones: ["neutral", "direct"],
+      tells: [
+        {
+          quote: "when you get a sec",
+          reads:
+            "Sounds casual, but paired with a call request it usually means soon, not whenever.",
+        },
+      ],
       confidence: 55,
       upset: "no",
       upsetReason:
@@ -80,6 +99,13 @@ export const SAMPLES: DemoSample[] = [
       meaning:
         "A one-word 'ok.' with a period can read as flat or a little distant — but there's very little to go on here. This could just as easily mean they're busy. Don't over-read a single word.",
       tones: ["distant", "ambiguous"],
+      tells: [
+        {
+          quote: "ok.",
+          reads:
+            "One word with a hard period reads flat or distant after a real message — though it can just mean busy.",
+        },
+      ],
       confidence: 38,
       upset: "probably",
       upsetReason:
@@ -104,6 +130,18 @@ export const SAMPLES: DemoSample[] = [
       meaning:
         "This is not actually permission. It usually means they're hurt or worn down and have stopped arguing — they want you to notice and care, not to literally do whatever you want.",
       tones: ["hurt", "frustrated"],
+      tells: [
+        {
+          quote: "Fine.",
+          reads:
+            "'Fine.' on its own is rarely fine — it signals they've stopped arguing, not that they agree.",
+        },
+        {
+          quote: "Do whatever you want",
+          reads:
+            "This is withdrawal, not permission — they want you to notice and push back, not take them literally.",
+        },
+      ],
       confidence: 80,
       upset: "yes",
       upsetReason:
@@ -129,6 +167,18 @@ export const SAMPLES: DemoSample[] = [
       meaning:
         "A genuine-sounding cancellation. 'Something came up' is vague, but the apology and the nervous emoji suggest they actually feel bad — not that they're blowing you off.",
       tones: ["apologetic", "sincere"],
+      tells: [
+        {
+          quote: "sorry",
+          reads:
+            "A genuine apology up front — they feel bad about it, they're not blowing you off.",
+        },
+        {
+          quote: "😬",
+          reads:
+            "The nervous grimace shows they're uncomfortable letting you down.",
+        },
+      ],
       confidence: 70,
       upset: "no",
       upsetReason: "They're apologizing to you, not upset with you.",
@@ -152,6 +202,18 @@ export const SAMPLES: DemoSample[] = [
       meaning:
         "It is almost certainly not fine. This signals they feel they're carrying the work — they want you to step up and take your share, not to actually hand it all to them.",
       tones: ["frustrated", "passive-aggressive"],
+      tells: [
+        {
+          quote: "I'll just do it myself",
+          reads:
+            "Classic resentment — they feel they're carrying the load and want you to step up, not actually take over.",
+        },
+        {
+          quote: "it's fine",
+          reads:
+            "'It's fine' right after that is the opposite of fine — it's a test to see whether you'll notice.",
+        },
+      ],
       confidence: 82,
       upset: "yes",
       upsetReason:
@@ -180,6 +242,7 @@ export const GENERIC_DEMO_DECODE: DecodeResult = {
   meaning:
     "On the surface this is straightforward, but the tone suggests there's a little more underneath. Read it as sincere unless you have history that says otherwise.",
   tones: ["neutral", "sincere"],
+  tells: [],
   confidence: 45,
   upset: "no",
   upsetReason:

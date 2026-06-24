@@ -272,7 +272,7 @@ export function ReadTheRoom() {
           {mode === "decode" && result && (
             <>
               {result.crisisFlag && <SafetyBanner />}
-              <DecodeResultView result={result} />
+              <DecodeResultView result={result} message={decoded?.message ?? ""} />
               {decoded && (
                 <ReplyDrafts
                   key={decoded.message}

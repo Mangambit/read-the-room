@@ -1,7 +1,8 @@
-import type { DecodeResult, Upset, Urgency } from "@/lib/schema";
+import type { DecodeResult, Tell, Upset, Urgency } from "@/lib/schema";
 
 type Props = {
   result: DecodeResult;
+  message: string;
 };
 
 const UPSET_LABEL: Record<Upset, string> = {
@@ -24,6 +25,47 @@ function confidenceColor(confidence: number): string {
 
 const URGENCY_FILLED: Record<Urgency, number> = { low: 1, medium: 2, high: 3 };
 
+/** Render the message with each tell's exact phrase highlighted. */
+function highlightTells(message: string, tells: Tell[]): React.ReactNode[] {
+  const ranges = tells
+    .map((t) => {
+      const start = message.indexOf(t.quote);
+      return start < 0 ? null : { start, end: start + t.quote.length, tell: t };
+    })
+    .filter((r): r is { start: number; end: number; tell: Tell } => r !== null)
+    .sort((a, b) => a.start - b.start);
+
+  // drop overlaps
+  const clean: typeof ranges = [];
+  let lastEnd = -1;
+  for (const r of ranges) {
+    if (r.start >= lastEnd) {
+      clean.push(r);
+      lastEnd = r.end;
+    }
+  }
+
+  if (clean.length === 0) return [message];
+
+  const nodes: React.ReactNode[] = [];
+  let cursor = 0;
+  clean.forEach((r, i) => {
+    if (r.start > cursor) nodes.push(message.slice(cursor, r.start));
+    nodes.push(
+      <mark
+        key={i}
+        title={r.tell.reads}
+        className="rounded bg-rose-soft px-0.5 text-ink decoration-rose-ink/40 underline decoration-dotted underline-offset-2"
+      >
+        {message.slice(r.start, r.end)}
+      </mark>,
+    );
+    cursor = r.end;
+  });
+  if (cursor < message.length) nodes.push(message.slice(cursor));
+  return nodes;
+}
+
 function Eyebrow({
   children,
   tone = "ink",
@@ -33,17 +75,25 @@ function Eyebrow({
 }) {
   const color = tone === "plum" ? "text-on-plum-soft" : "text-ink-faint";
   return (
-    <p
-      className={`text-[0.7rem] font-bold uppercase tracking-[0.16em] ${color}`}
-    >
+    <p className={`text-[0.7rem] font-bold uppercase tracking-[0.16em] ${color}`}>
       {children}
     </p>
   );
 }
 
-export function DecodeResultView({ result }: Props) {
+export function DecodeResultView({ result, message }: Props) {
+  const hasTells = result.tells.length > 0;
+
   return (
     <article className="flex flex-col gap-3">
+      {/* Their message, with the tells highlighted */}
+      <div className="animate-rise rounded-card border border-line bg-paper-raised p-5 shadow-soft sm:p-6">
+        <Eyebrow>Their message</Eyebrow>
+        <p className="mt-2 text-[1.05rem] leading-relaxed text-ink">
+          {highlightTells(message, result.tells)}
+        </p>
+      </div>
+
       {/* The reveal — the hidden meaning, seen through the surface */}
       <div className="reveal-scan animate-rise rounded-card bg-plum p-6 text-on-plum shadow-plum sm:p-8">
         <Eyebrow tone="plum">What they really mean</Eyebrow>
@@ -62,10 +112,25 @@ export function DecodeResultView({ result }: Props) {
         </ul>
       </div>
 
-      {/* The read-outs — on the calm light surface */}
+      {/* Read-outs */}
       <div className="animate-rise rounded-card border border-line bg-paper-raised p-6 shadow-soft sm:p-8">
+        {hasTells && (
+          <div className="mb-6 border-b border-line pb-6">
+            <Eyebrow>What gave it away</Eyebrow>
+            <ul className="mt-3 flex flex-col gap-2.5">
+              {result.tells.map((t, i) => (
+                <li key={i} className="text-[0.95rem] leading-relaxed">
+                  <span className="font-bold text-rose-ink">
+                    &ldquo;{t.quote}&rdquo;
+                  </span>{" "}
+                  <span className="text-ink-soft">— {t.reads}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
         <div className="grid gap-6 sm:grid-cols-2">
-          {/* Upset */}
           <div>
             <Eyebrow>Are they upset with you?</Eyebrow>
             <p className={`mt-2 text-lg font-bold ${upsetColor(result.upset)}`}>
@@ -76,7 +141,6 @@ export function DecodeResultView({ result }: Props) {
             </p>
           </div>
 
-          {/* Confidence */}
           <div>
             <Eyebrow>How sure this read is</Eyebrow>
             <div className="mt-3 flex items-center gap-3">
@@ -92,7 +156,6 @@ export function DecodeResultView({ result }: Props) {
             </div>
           </div>
 
-          {/* Urgency */}
           <div>
             <Eyebrow>Urgency</Eyebrow>
             <div className="mt-3 flex items-center gap-2">
@@ -113,8 +176,7 @@ export function DecodeResultView({ result }: Props) {
             </div>
           </div>
 
-          {/* What they want */}
-          <div className="rounded-2xl border-l-4 border-rose bg-rose-soft/60 px-4 py-3 sm:col-span-1">
+          <div className="rounded-2xl border-l-4 border-rose bg-rose-soft/60 px-4 py-3">
             <Eyebrow>What they want from you</Eyebrow>
             <p className="mt-1.5 text-[0.95rem] leading-relaxed text-ink">
               {result.wants}

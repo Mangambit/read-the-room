@@ -37,12 +37,22 @@ export type Upset = z.infer<typeof Upset>;
 export const Urgency = z.enum(["low", "medium", "high"]);
 export type Urgency = z.infer<typeof Urgency>;
 
+/** A specific phrase in the message and what it signals. The quote must be an
+ *  exact substring of the original so the UI can highlight it. */
+export const TellSchema = z.object({
+  quote: z.string().min(1).max(160),
+  reads: z.string().min(1).max(240),
+});
+export type Tell = z.infer<typeof TellSchema>;
+
 /** Result of decoding a received message. One-shot structured output. */
 export const DecodeResultSchema = z.object({
   /** Plain-English: what they actually mean. 1-2 sentences. */
   meaning: z.string().min(1).max(600),
   /** 1-4 short tone adjectives, lowercase. */
   tones: z.array(z.string().min(1).max(30)).min(1).max(4),
+  /** The exact words that gave it away (0-3), for highlighting. */
+  tells: z.array(TellSchema).max(3).default([]),
   /** How confident the read is, 0-100. */
   confidence: z.number().int().min(0).max(100),
   /** Is the sender upset *with the reader*? */
