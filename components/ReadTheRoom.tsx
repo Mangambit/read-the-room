@@ -151,15 +151,14 @@ export function ReadTheRoom() {
     <div className="flex flex-col gap-6">
       {/* Mode toggle */}
       <div
-        role="tablist"
+        role="group"
         aria-label="What do you want to do?"
         className="inline-flex self-start rounded-chip border border-line bg-paper-raised p-1"
       >
         {(["decode", "presend"] as Mode[]).map((m) => (
           <button
             key={m}
-            role="tab"
-            aria-selected={mode === m}
+            aria-pressed={mode === m}
             type="button"
             onClick={() => switchMode(m)}
             className={`rounded-chip px-4 py-1.5 text-sm font-bold transition ${
@@ -170,6 +169,17 @@ export function ReadTheRoom() {
           </button>
         ))}
       </div>
+
+      {/* Screen-reader status for async results */}
+      <p aria-live="polite" className="sr-only">
+        {status === "loading"
+          ? "Reading your message, please wait."
+          : status === "done"
+            ? mode === "decode"
+              ? "The decode is ready below."
+              : "The reply check is ready below."
+            : ""}
+      </p>
 
       <form
         onSubmit={handleSubmit}
@@ -300,7 +310,11 @@ export function ReadTheRoom() {
 
 function DecodeSkeleton() {
   return (
-    <div className="flex flex-col gap-3">
+    <div
+      role="status"
+      aria-label="Reading your message, please wait"
+      className="flex flex-col gap-3"
+    >
       <div className="rounded-card border border-line bg-paper-raised p-5 shadow-soft sm:p-6">
         <div className="skeleton h-3 w-24 rounded" />
         <div className="skeleton mt-3 h-4 w-full rounded" />

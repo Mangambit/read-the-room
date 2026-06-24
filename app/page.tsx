@@ -15,8 +15,8 @@ export default function Home() {
           </h1>
         </div>
         <p className="mt-3 font-display text-h1 leading-tight text-ink">
-          Understand what they{" "}
-          <span className="italic text-rose">really</span> mean.
+          What did they{" "}
+          <span className="italic text-rose">really</span> mean?
         </p>
         <p className="mt-2 max-w-prose text-ink-soft">
           Paste a message that&rsquo;s hard to read. Get the tone, the hidden

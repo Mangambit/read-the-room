@@ -40,7 +40,7 @@ export default function Landing() {
           </p>
           <h1 className="mt-4 font-display text-display leading-[0.98] text-ink">
             What did they{" "}
-            <span className="italic text-rose">actually</span> mean?
+            <span className="italic text-rose">really</span> mean?
           </h1>
           <p className="mt-5 max-w-md text-lg leading-relaxed text-ink-soft">
             A clipped &ldquo;ok.&rdquo; A &ldquo;fine, do whatever.&rdquo; Some

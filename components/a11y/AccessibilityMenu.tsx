@@ -1,11 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 /**
  * Accessibility controls. Sets data-attributes on <html> that the CSS in
  * globals.css responds to (dyslexia font, high contrast, reduced motion).
  * Pure CSS effect — instant, no network, works in demo mode. Persists choices.
+ *
+ * A non-modal disclosure: the trigger owns aria-expanded; opening moves focus
+ * into the panel; Escape and outside-click close it and return focus.
  */
 
 type Settings = {
@@ -18,12 +21,12 @@ const STORAGE_KEY = "rtr-a11y";
 
 function apply(s: Settings) {
   const el = document.documentElement;
-  el.dataset.dyslexia = s.dyslexia ? "true" : "";
-  el.dataset.contrast = s.contrast ? "high" : "";
-  el.dataset.motion = s.motion ? "reduced" : "";
-  if (!s.dyslexia) delete el.dataset.dyslexia;
-  if (!s.contrast) delete el.dataset.contrast;
-  if (!s.motion) delete el.dataset.motion;
+  if (s.dyslexia) el.dataset.dyslexia = "true";
+  else delete el.dataset.dyslexia;
+  if (s.contrast) el.dataset.contrast = "high";
+  else delete el.dataset.contrast;
+  if (s.motion) el.dataset.motion = "reduced";
+  else delete el.dataset.motion;
 }
 
 const TOGGLES: { key: keyof Settings; label: string; hint: string }[] = [
@@ -39,21 +42,55 @@ export function AccessibilityMenu() {
     contrast: false,
     motion: false,
   });
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
 
   // Load saved settings on mount.
   useEffect(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
-        const saved = { ...settings, ...JSON.parse(raw) } as Settings;
+        const saved = { dyslexia: false, contrast: false, motion: false, ...JSON.parse(raw) } as Settings;
         setSettings(saved);
         apply(saved);
       }
     } catch {
       // ignore corrupt storage
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Focus management + Escape + outside-click while open.
+  useEffect(() => {
+    if (!open) return;
+    const firstSwitch = panelRef.current?.querySelector<HTMLButtonElement>(
+      'button[role="switch"]',
+    );
+    firstSwitch?.focus();
+
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        setOpen(false);
+        triggerRef.current?.focus();
+      }
+    }
+    function onDown(e: MouseEvent) {
+      const t = e.target as Node;
+      if (
+        panelRef.current &&
+        !panelRef.current.contains(t) &&
+        triggerRef.current &&
+        !triggerRef.current.contains(t)
+      ) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("keydown", onKey);
+    document.addEventListener("mousedown", onDown);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("mousedown", onDown);
+    };
+  }, [open]);
 
   function toggle(key: keyof Settings) {
     const next = { ...settings, [key]: !settings[key] };
@@ -70,11 +107,15 @@ export function AccessibilityMenu() {
     <div className="fixed bottom-5 right-5 z-50">
       {open && (
         <div
-          role="dialog"
-          aria-label="Accessibility settings"
+          ref={panelRef}
+          role="group"
+          aria-labelledby="a11y-heading"
           className="mb-3 w-64 rounded-card border border-line bg-paper-raised p-4 shadow-lift"
         >
-          <p className="text-[0.7rem] font-bold uppercase tracking-[0.16em] text-ink-faint">
+          <p
+            id="a11y-heading"
+            className="text-[0.7rem] font-bold uppercase tracking-[0.16em] text-ink-faint"
+          >
             Make it easier to read
           </p>
           <ul className="mt-3 flex flex-col gap-2">
@@ -114,6 +155,7 @@ export function AccessibilityMenu() {
       )}
 
       <button
+        ref={triggerRef}
         type="button"
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}

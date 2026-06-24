@@ -43,8 +43,8 @@ export function DecodeReveal() {
         </p>
         <p className="mt-1.5 font-display text-xl leading-snug text-on-plum">
           They&rsquo;re annoyed you&rsquo;re late and want it in now. The{" "}
-          <span className="text-rose">&ldquo;extra support&rdquo;</span> is a
-          polite jab, not a real offer.
+          <span className="text-rose-light">&ldquo;extra support&rdquo;</span> is
+          a polite jab, not a real offer.
         </p>
         <div className="mt-3 flex flex-wrap gap-2 text-sm text-on-plum-soft">
           {["passive-aggressive", "upset with you", "high urgency"].map((t) => (

@@ -130,7 +130,7 @@ export function ReplyDrafts({ message, decode, sender }: Props) {
           Your reply
         </p>
         <div
-          role="tablist"
+          role="group"
           aria-label="Reply tone"
           className="inline-flex rounded-chip border border-line bg-paper p-1"
         >
@@ -139,8 +139,7 @@ export function ReplyDrafts({ message, decode, sender }: Props) {
             return (
               <button
                 key={t}
-                role="tab"
-                aria-selected={active}
+                aria-pressed={active}
                 type="button"
                 onClick={() => selectTone(t)}
                 className={`rounded-chip px-3 py-1 text-sm transition ${

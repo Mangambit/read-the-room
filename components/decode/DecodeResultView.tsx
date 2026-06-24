@@ -1,4 +1,7 @@
-import type { DecodeResult, Tell, Upset, Urgency } from "@/lib/schema";
+"use client";
+
+import { useState } from "react";
+import type { DecodeResult, Upset, Urgency } from "@/lib/schema";
 
 type Props = {
   result: DecodeResult;
@@ -23,48 +26,14 @@ function confidenceColor(confidence: number): string {
   return "bg-ink-faint";
 }
 
-const URGENCY_FILLED: Record<Urgency, number> = { low: 1, medium: 2, high: 3 };
-
-/** Render the message with each tell's exact phrase highlighted. */
-function highlightTells(message: string, tells: Tell[]): React.ReactNode[] {
-  const ranges = tells
-    .map((t) => {
-      const start = message.indexOf(t.quote);
-      return start < 0 ? null : { start, end: start + t.quote.length, tell: t };
-    })
-    .filter((r): r is { start: number; end: number; tell: Tell } => r !== null)
-    .sort((a, b) => a.start - b.start);
-
-  // drop overlaps
-  const clean: typeof ranges = [];
-  let lastEnd = -1;
-  for (const r of ranges) {
-    if (r.start >= lastEnd) {
-      clean.push(r);
-      lastEnd = r.end;
-    }
-  }
-
-  if (clean.length === 0) return [message];
-
-  const nodes: React.ReactNode[] = [];
-  let cursor = 0;
-  clean.forEach((r, i) => {
-    if (r.start > cursor) nodes.push(message.slice(cursor, r.start));
-    nodes.push(
-      <mark
-        key={i}
-        title={r.tell.reads}
-        className="rounded bg-rose-soft px-0.5 text-ink decoration-rose-ink/40 underline decoration-dotted underline-offset-2"
-      >
-        {message.slice(r.start, r.end)}
-      </mark>,
-    );
-    cursor = r.end;
-  });
-  if (cursor < message.length) nodes.push(message.slice(cursor));
-  return nodes;
+function confidenceWord(confidence: number): string {
+  if (confidence >= 80) return "very sure";
+  if (confidence >= 60) return "fairly sure";
+  if (confidence >= 40) return "a real guess";
+  return "low — little to go on";
 }
+
+const URGENCY_FILLED: Record<Urgency, number> = { low: 1, medium: 2, high: 3 };
 
 function Eyebrow({
   children,
@@ -82,25 +51,78 @@ function Eyebrow({
 }
 
 export function DecodeResultView({ result, message }: Props) {
-  const hasTells = result.tells.length > 0;
+  const { tells } = result;
+  const hasTells = tells.length > 0;
+  const [hovered, setHovered] = useState<number | null>(null);
+
+  // Render the message with each tell's exact phrase highlighted, linked to its
+  // explanation in the list below (hover/focus one to light up the other).
+  function highlightedMessage(): React.ReactNode[] {
+    const ranges = tells
+      .map((t, i) => {
+        const start = message.indexOf(t.quote);
+        return start < 0 ? null : { start, end: start + t.quote.length, i };
+      })
+      .filter((r): r is { start: number; end: number; i: number } => r !== null)
+      .sort((a, b) => a.start - b.start);
+
+    const clean: typeof ranges = [];
+    let lastEnd = -1;
+    for (const r of ranges) {
+      if (r.start >= lastEnd) {
+        clean.push(r);
+        lastEnd = r.end;
+      }
+    }
+    if (clean.length === 0) return [message];
+
+    const nodes: React.ReactNode[] = [];
+    let cursor = 0;
+    clean.forEach((r) => {
+      if (r.start > cursor) nodes.push(message.slice(cursor, r.start));
+      const on = hovered === r.i;
+      nodes.push(
+        <mark
+          key={r.i}
+          aria-describedby={`tell-${r.i}`}
+          onMouseEnter={() => setHovered(r.i)}
+          onMouseLeave={() => setHovered(null)}
+          className={`rounded px-0.5 text-ink transition-colors ${
+            on ? "bg-rose text-on-rose" : "bg-rose-soft"
+          }`}
+        >
+          {message.slice(r.start, r.end)}
+        </mark>,
+      );
+      cursor = r.end;
+    });
+    if (cursor < message.length) nodes.push(message.slice(cursor));
+    return nodes;
+  }
 
   return (
     <article className="flex flex-col gap-3">
       {/* Their message, with the tells highlighted */}
-      <div className="animate-rise rounded-card border border-line bg-paper-raised p-5 shadow-soft sm:p-6" style={{ animationDelay: "0ms" }}>
+      <div
+        className="animate-rise rounded-card border border-line bg-paper-raised p-5 shadow-soft sm:p-6"
+        style={{ animationDelay: "0ms" }}
+      >
         <Eyebrow>Their message</Eyebrow>
         <p className="mt-2 text-[1.05rem] leading-relaxed text-ink">
-          {highlightTells(message, result.tells)}
+          {highlightedMessage()}
         </p>
       </div>
 
       {/* The reveal — the hidden meaning, seen through the surface */}
-      <div className="reveal-scan animate-rise rounded-card bg-plum p-6 text-on-plum shadow-plum sm:p-8" style={{ animationDelay: "90ms" }}>
+      <div
+        className="reveal-scan animate-rise rounded-card bg-plum p-7 text-on-plum shadow-plum sm:p-9"
+        style={{ animationDelay: "90ms" }}
+      >
         <Eyebrow tone="plum">What they really mean</Eyebrow>
-        <p className="mt-3 font-display text-meaning leading-snug text-on-plum">
+        <p className="decode-in mt-3 font-display text-meaning leading-snug text-on-plum">
           {result.meaning}
         </p>
-        <ul className="mt-5 flex flex-wrap gap-2">
+        <ul aria-label="Tone" className="mt-5 flex flex-wrap gap-2">
           {result.tones.map((tone) => (
             <li
               key={tone}
@@ -112,25 +134,51 @@ export function DecodeResultView({ result, message }: Props) {
         </ul>
       </div>
 
-      {/* Read-outs */}
-      <div className="animate-rise rounded-card border border-line bg-paper-raised p-6 shadow-soft sm:p-8" style={{ animationDelay: "180ms" }}>
-        {hasTells && (
-          <div className="mb-6 border-b border-line pb-6">
-            <Eyebrow>What gave it away</Eyebrow>
-            <ul className="mt-3 flex flex-col gap-2.5">
-              {result.tells.map((t, i) => (
-                <li key={i} className="text-[0.95rem] leading-relaxed">
-                  <span className="font-bold text-rose-ink">
-                    &ldquo;{t.quote}&rdquo;
-                  </span>{" "}
-                  <span className="text-ink-soft">— {t.reads}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+      {/* What they want — the payload, promoted directly under the reveal */}
+      <div
+        className="animate-rise rounded-card border-l-4 border-rose bg-rose-soft/50 px-6 py-5 sm:px-8"
+        style={{ animationDelay: "150ms" }}
+      >
+        <Eyebrow>What they want from you</Eyebrow>
+        <p className="mt-1.5 text-[1.05rem] font-medium leading-relaxed text-ink">
+          {result.wants}
+        </p>
+      </div>
 
-        <div className="grid gap-6 sm:grid-cols-2">
+      {/* What gave it away — the evidence (interactive: hover to link) */}
+      {hasTells && (
+        <div
+          className="animate-rise rounded-card border border-line bg-paper-raised p-6 shadow-soft sm:p-8"
+          style={{ animationDelay: "210ms" }}
+        >
+          <Eyebrow>What gave it away</Eyebrow>
+          <ul className="mt-3 flex flex-col gap-2.5">
+            {tells.map((t, i) => (
+              <li
+                key={i}
+                id={`tell-${i}`}
+                onMouseEnter={() => setHovered(i)}
+                onMouseLeave={() => setHovered(null)}
+                className={`rounded-lg px-2 py-1 text-[0.95rem] leading-relaxed transition-colors ${
+                  hovered === i ? "bg-rose-soft/60" : ""
+                }`}
+              >
+                <span className="font-bold text-rose-ink">
+                  &ldquo;{t.quote}&rdquo;
+                </span>{" "}
+                <span className="text-ink-soft">— {t.reads}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Diagnostics — a 3-up strip */}
+      <div
+        className="animate-rise rounded-card border border-line bg-paper-raised p-6 shadow-soft sm:p-8"
+        style={{ animationDelay: "270ms" }}
+      >
+        <div className="grid gap-6 sm:grid-cols-3">
           <div>
             <Eyebrow>Are they upset with you?</Eyebrow>
             <p className={`mt-2 text-lg font-bold ${upsetColor(result.upset)}`}>
@@ -143,7 +191,14 @@ export function DecodeResultView({ result, message }: Props) {
 
           <div>
             <Eyebrow>How sure this read is</Eyebrow>
-            <div className="mt-3 flex items-center gap-3">
+            <div
+              role="meter"
+              aria-valuenow={result.confidence}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-label={`Confidence ${result.confidence} percent, ${confidenceWord(result.confidence)}`}
+              className="mt-3 flex items-center gap-3"
+            >
               <div className="h-2 flex-1 overflow-hidden rounded-full bg-paper-sunk">
                 <div
                   className={`h-full rounded-full ${confidenceColor(result.confidence)} transition-[width] duration-700`}
@@ -154,6 +209,9 @@ export function DecodeResultView({ result, message }: Props) {
                 {result.confidence}%
               </span>
             </div>
+            <p className="mt-1 text-sm text-ink-soft">
+              {confidenceWord(result.confidence)}
+            </p>
           </div>
 
           <div>
@@ -174,13 +232,6 @@ export function DecodeResultView({ result, message }: Props) {
                 {result.urgency}
               </span>
             </div>
-          </div>
-
-          <div className="rounded-2xl border-l-4 border-rose bg-rose-soft/60 px-4 py-3">
-            <Eyebrow>What they want from you</Eyebrow>
-            <p className="mt-1.5 text-[0.95rem] leading-relaxed text-ink">
-              {result.wants}
-            </p>
           </div>
         </div>
       </div>
