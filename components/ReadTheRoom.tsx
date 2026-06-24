@@ -237,7 +237,7 @@ export function ReadTheRoom() {
           <button
             type="submit"
             disabled={!canSubmit}
-            className="shrink-0 rounded-chip bg-ink px-6 py-3 font-bold text-paper shadow-soft transition hover:bg-rose disabled:cursor-not-allowed disabled:opacity-40"
+            className="shrink-0 rounded-chip bg-ink px-6 py-3 font-bold text-paper shadow-soft transition hover:-translate-y-0.5 hover:bg-rose hover:shadow-lift active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0"
           >
             {status === "loading"
               ? mode === "decode"
@@ -258,7 +258,7 @@ export function ReadTheRoom() {
               type="button"
               onClick={() => loadSample(s.id)}
               disabled={status === "loading"}
-              className="rounded-chip border border-line bg-paper px-3 py-1 text-sm text-ink-soft transition hover:border-rose hover:text-ink disabled:opacity-40"
+              className="rounded-chip border border-line bg-paper px-3 py-1 text-sm text-ink-soft transition hover:-translate-y-px hover:border-rose hover:text-ink disabled:opacity-40"
             >
               {s.label}
             </button>
