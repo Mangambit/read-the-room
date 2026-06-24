@@ -18,11 +18,18 @@
   --color-line: oklch(89% 0.012 72);
 
   --color-terracotta: oklch(60% 0.142 38);
+  --color-terracotta-ink: oklch(47% 0.13 38);
   --color-terracotta-soft: oklch(93% 0.04 46);
   --color-sage: oklch(58% 0.062 158);
+  --color-sage-ink: oklch(46% 0.07 158);
   --color-sage-soft: oklch(93.5% 0.03 158);
   --color-amber: oklch(78% 0.114 74);
-  --color-flag: oklch(57% 0.158 30);
+  --color-amber-ink: oklch(52% 0.1 74);
+  --color-flag: oklch(52% 0.16 30);
+
+  --text-meaning: clamp(1.5rem, 1.1rem + 1.6vw, 1.9rem);
+  --text-h1: clamp(2rem, 1.4rem + 3vw, 3rem);
+  --text-display: clamp(2.75rem, 1.6rem + 5vw, 5rem);
 
   --font-serif: var(--font-fraunces), Georgia, serif;
   --font-sans: var(--font-atkinson), ui-sans-serif, system-ui, sans-serif;
@@ -108,6 +115,16 @@ html[data-motion="reduced"] *::after {
 /* ── Small shared niceties ── */
 ::selection {
   background: var(--color-terracotta-soft);
+}
+
+/* Visible focus for keyboard users on every interactive element */
+:focus-visible {
+  outline: 2px solid var(--color-terracotta);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+button:focus:not(:focus-visible) {
+  outline: none;
 }
 
 @keyframes rise {

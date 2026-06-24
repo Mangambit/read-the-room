@@ -37,7 +37,7 @@ export function DecodeResultView({ result }: Props) {
     <article className="animate-rise rounded-card border border-line bg-paper-raised p-6 shadow-soft sm:p-8">
       {/* The meaning — the hero of the result */}
       <Eyebrow>What they really mean</Eyebrow>
-      <p className="mt-3 font-serif text-2xl leading-snug text-ink sm:text-[1.75rem]">
+      <p className="mt-3 font-serif text-meaning leading-snug text-ink">
         {result.meaning}
       </p>
 

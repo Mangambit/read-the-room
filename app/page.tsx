@@ -13,7 +13,7 @@ export default function Home() {
             Read the Room
           </h1>
         </div>
-        <p className="mt-3 font-serif text-3xl leading-tight text-ink sm:text-4xl">
+        <p className="mt-3 font-serif text-h1 leading-tight text-ink">
           Understand what they{" "}
           <span className="italic text-terracotta">really</span> mean.
         </p>
