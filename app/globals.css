@@ -33,7 +33,7 @@
 
   /* Semantic read-outs (temperature: calm → caution → heat) */
   --color-calm: #3f7d66;
-  --color-caution: #946b1c; /* AA as text on light (was #bf8526, ~3.2:1) */
+  --color-caution: #855d12; /* AA as text on any light surface (was #bf8526, ~3.2:1) */
   --color-heat: #b8443f;
 
   --font-display: var(--font-schibsted), ui-sans-serif, system-ui, sans-serif;
