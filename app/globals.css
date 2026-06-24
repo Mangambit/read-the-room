@@ -1,26 +1,141 @@
 @import "tailwindcss";
 
+/* ─────────────────────────────────────────────────────────────
+   Read the Room — warm editorial design system
+   Direction: a thoughtful magazine meets a calm journaling app.
+   Palette in oklch for perceptual consistency. Two real typefaces:
+   Fraunces (serif, the "meaning" moments) + Atkinson Hyperlegible
+   (sans UI — which doubles as the dyslexia-friendly accessibility font).
+   ───────────────────────────────────────────────────────────── */
+
+@theme {
+  --color-paper: oklch(98.2% 0.006 83);
+  --color-paper-raised: oklch(96.3% 0.009 78);
+  --color-paper-sunk: oklch(94.6% 0.011 76);
+  --color-ink: oklch(28% 0.021 58);
+  --color-ink-soft: oklch(46% 0.018 58);
+  --color-ink-faint: oklch(62% 0.014 60);
+  --color-line: oklch(89% 0.012 72);
+
+  --color-terracotta: oklch(60% 0.142 38);
+  --color-terracotta-soft: oklch(93% 0.04 46);
+  --color-sage: oklch(58% 0.062 158);
+  --color-sage-soft: oklch(93.5% 0.03 158);
+  --color-amber: oklch(78% 0.114 74);
+  --color-flag: oklch(57% 0.158 30);
+
+  --font-serif: var(--font-fraunces), Georgia, serif;
+  --font-sans: var(--font-atkinson), ui-sans-serif, system-ui, sans-serif;
+
+  --radius-card: 1.25rem;
+  --radius-chip: 999px;
+
+  --shadow-soft: 0 1px 2px oklch(28% 0.02 58 / 0.04),
+    0 8px 24px oklch(28% 0.02 58 / 0.06);
+  --shadow-lift: 0 2px 4px oklch(28% 0.02 58 / 0.06),
+    0 18px 48px oklch(28% 0.02 58 / 0.1);
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --grain-opacity: 0.035;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  color-scheme: light;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  position: relative;
+  min-height: 100dvh;
+}
+
+/* Subtle paper grain for atmosphere (compositor-friendly, fixed) */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: var(--grain-opacity);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ── Accessibility modes (toggled by data-attrs on <html> in Phase 4) ── */
+
+/* Dyslexia-friendly: Atkinson Hyperlegible is already the UI font; this widens
+   spacing and forces the sans everywhere including the serif headings. */
+html[data-dyslexia="true"] {
+  --font-serif: var(--font-atkinson), ui-sans-serif, sans-serif;
+  letter-spacing: 0.01em;
+  word-spacing: 0.06em;
+  line-height: 1.75;
+}
+
+/* High contrast */
+html[data-contrast="high"] {
+  --color-paper: oklch(100% 0 0);
+  --color-paper-raised: oklch(98% 0 0);
+  --color-ink: oklch(18% 0.02 58);
+  --color-ink-soft: oklch(30% 0.02 58);
+  --color-line: oklch(72% 0.02 70);
+  --grain-opacity: 0;
+}
+
+/* Reduced motion (user setting OR site toggle) */
+html[data-motion="reduced"] *,
+html[data-motion="reduced"] *::before,
+html[data-motion="reduced"] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* ── Small shared niceties ── */
+::selection {
+  background: var(--color-terracotta-soft);
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-rise {
+  animation: rise 0.5s var(--ease-out-expo) both;
+}
+
+@keyframes shimmer {
+  to {
+    background-position: 200% 0;
+  }
+}
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-paper-sunk) 25%,
+    var(--color-paper-raised) 50%,
+    var(--color-paper-sunk) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s linear infinite;
 }

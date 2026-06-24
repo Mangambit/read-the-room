@@ -1,65 +1,39 @@
-import Image from "next/image";
+import { ReadTheRoom } from "@/components/ReadTheRoom";
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <div className="relative z-10 mx-auto flex min-h-dvh w-full max-w-2xl flex-col px-5 py-10 sm:py-16">
+      <header className="mb-8">
+        <div className="flex items-baseline gap-2">
+          <span
+            aria-hidden
+            className="h-2.5 w-2.5 rounded-full bg-terracotta"
+          />
+          <h1 className="font-serif text-lg font-semibold tracking-tight text-ink">
+            Read the Room
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+        <p className="mt-3 font-serif text-3xl leading-tight text-ink sm:text-4xl">
+          Understand what they{" "}
+          <span className="italic text-terracotta">really</span> mean.
+        </p>
+        <p className="mt-2 max-w-prose text-ink-soft">
+          Paste a message that&rsquo;s hard to read. Get the tone, the hidden
+          ask, and a reply — in plain language. Built for neurodivergent minds;
+          useful for everyone.
+        </p>
+      </header>
+
+      <main className="flex-1">
+        <ReadTheRoom />
       </main>
+
+      <footer className="mt-12 border-t border-line pt-5 text-xs text-ink-faint">
+        <p>
+          We never store your messages. They&rsquo;re read once to help you, then
+          discarded.
+        </p>
+      </footer>
     </div>
   );
 }
