@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { Fraunces, Atkinson_Hyperlegible } from "next/font/google";
+import { Schibsted_Grotesk, Atkinson_Hyperlegible } from "next/font/google";
 import "./globals.css";
 
-const fraunces = Fraunces({
+const schibsted = Schibsted_Grotesk({
   subsets: ["latin"],
-  variable: "--font-fraunces",
+  variable: "--font-schibsted",
   display: "swap",
 });
 
@@ -29,7 +29,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${fraunces.variable} ${atkinson.variable}`}
+      className={`${schibsted.variable} ${atkinson.variable}`}
       suppressHydrationWarning
     >
       <body className="min-h-dvh">{children}</body>

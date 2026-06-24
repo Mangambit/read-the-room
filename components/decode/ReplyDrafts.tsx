@@ -128,7 +128,7 @@ export function ReplyDrafts({ message, decode, sender }: Props) {
           <p className="whitespace-pre-wrap">
             {current}
             {isStreaming && (
-              <span className="ml-0.5 inline-block h-4 w-[2px] animate-pulse bg-terracotta align-middle" />
+              <span className="ml-0.5 inline-block h-4 w-[2px] animate-pulse bg-rose align-middle" />
             )}
           </p>
         ) : (
@@ -143,11 +143,11 @@ export function ReplyDrafts({ message, decode, sender }: Props) {
           type="button"
           onClick={copy}
           disabled={!current || isStreaming}
-          className="rounded-chip border border-line bg-paper px-4 py-1.5 text-sm font-bold text-ink transition hover:border-terracotta disabled:opacity-40"
+          className="rounded-chip border border-line bg-paper px-4 py-1.5 text-sm font-bold text-ink transition hover:border-rose disabled:opacity-40"
         >
           {copied ? "Copied ✓" : "Copy"}
         </button>
-        {error && <span className="text-sm text-flag">{error}</span>}
+        {error && <span className="text-sm text-heat">{error}</span>}
       </div>
     </section>
   );

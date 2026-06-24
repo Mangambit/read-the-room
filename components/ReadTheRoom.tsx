@@ -93,7 +93,7 @@ export function ReadTheRoom() {
           rows={4}
           maxLength={4000}
           placeholder="e.g. “Per my last email, the assignment was due Friday…”"
-          className="mt-2 w-full resize-y rounded-2xl border border-line bg-paper px-4 py-3 text-ink outline-none transition placeholder:text-ink-faint focus:border-terracotta focus:ring-4 focus:ring-terracotta-soft"
+          className="mt-2 w-full resize-y rounded-2xl border border-line bg-paper px-4 py-3 text-ink outline-none transition placeholder:text-ink-faint focus:border-rose focus:ring-4 focus:ring-rose-soft"
         />
 
         <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -112,8 +112,8 @@ export function ReadTheRoom() {
                     onClick={() => setSender(active ? null : s.value)}
                     className={`rounded-chip border px-3 py-1 text-sm transition ${
                       active
-                        ? "border-terracotta bg-terracotta text-paper"
-                        : "border-line bg-paper text-ink-soft hover:border-terracotta"
+                        ? "border-rose bg-rose text-paper"
+                        : "border-line bg-paper text-ink-soft hover:border-rose"
                     }`}
                   >
                     {s.label}
@@ -126,7 +126,7 @@ export function ReadTheRoom() {
           <button
             type="submit"
             disabled={!canSubmit}
-            className="shrink-0 rounded-chip bg-ink px-6 py-3 font-bold text-paper shadow-soft transition hover:bg-terracotta disabled:cursor-not-allowed disabled:opacity-40"
+            className="shrink-0 rounded-chip bg-ink px-6 py-3 font-bold text-paper shadow-soft transition hover:bg-rose disabled:cursor-not-allowed disabled:opacity-40"
           >
             {status === "loading" ? "Reading…" : "Read the room"}
           </button>
@@ -142,7 +142,7 @@ export function ReadTheRoom() {
             type="button"
             onClick={() => loadSample(s.id)}
             disabled={status === "loading"}
-            className="rounded-chip border border-line bg-paper px-3 py-1 text-sm text-ink-soft transition hover:border-terracotta hover:text-ink disabled:opacity-40"
+            className="rounded-chip border border-line bg-paper px-3 py-1 text-sm text-ink-soft transition hover:border-rose hover:text-ink disabled:opacity-40"
           >
             {s.label}
           </button>

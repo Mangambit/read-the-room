@@ -19,14 +19,14 @@ export default function Landing() {
       {/* Nav */}
       <nav className="mx-auto flex max-w-5xl items-center justify-between px-5 py-5">
         <div className="flex items-baseline gap-2">
-          <span aria-hidden className="h-2.5 w-2.5 rounded-full bg-terracotta" />
-          <span className="font-serif text-lg font-semibold text-ink">
+          <span aria-hidden className="h-2.5 w-2.5 rounded-full bg-rose" />
+          <span className="font-display text-lg font-semibold text-ink">
             Read the Room
           </span>
         </div>
         <Link
           href="/"
-          className="rounded-chip bg-ink px-4 py-2 text-sm font-bold text-paper transition hover:bg-terracotta"
+          className="rounded-chip bg-ink px-4 py-2 text-sm font-bold text-paper transition hover:bg-rose"
         >
           Open the app
         </Link>
@@ -35,12 +35,12 @@ export default function Landing() {
       {/* Hero */}
       <header className="mx-auto grid max-w-5xl items-center gap-12 px-5 pb-20 pt-10 lg:grid-cols-[1.05fr_1fr] lg:pt-16">
         <div>
-          <p className="text-[0.7rem] font-bold uppercase tracking-[0.18em] text-terracotta-ink">
+          <p className="text-[0.7rem] font-bold uppercase tracking-[0.18em] text-rose-ink">
             For everyone who overthinks the reply
           </p>
-          <h1 className="mt-4 font-serif text-display leading-[0.98] text-ink">
+          <h1 className="mt-4 font-display text-display leading-[0.98] text-ink">
             What did they{" "}
-            <span className="italic text-terracotta">actually</span> mean?
+            <span className="italic text-rose">actually</span> mean?
           </h1>
           <p className="mt-5 max-w-md text-lg leading-relaxed text-ink-soft">
             A clipped &ldquo;ok.&rdquo; A &ldquo;fine, do whatever.&rdquo; Some
@@ -51,7 +51,7 @@ export default function Landing() {
           <div className="mt-7 flex flex-wrap items-center gap-3">
             <Link
               href="/"
-              className="rounded-chip bg-ink px-6 py-3 font-bold text-paper shadow-soft transition hover:bg-terracotta"
+              className="rounded-chip bg-ink px-6 py-3 font-bold text-paper shadow-soft transition hover:bg-rose"
             >
               Read a message →
             </Link>
@@ -72,7 +72,7 @@ export default function Landing() {
         <div className="mx-auto max-w-3xl px-5 py-16 sm:py-20">
           <h2
             id="how"
-            className="font-serif text-h1 leading-tight text-ink"
+            className="font-display text-h1 leading-tight text-ink"
           >
             Three words can ruin your night.
             <br />
@@ -100,10 +100,10 @@ export default function Landing() {
                   </p>
                 </div>
                 <div>
-                  <p className="text-[0.7rem] font-bold uppercase tracking-[0.16em] text-terracotta-ink">
+                  <p className="text-[0.7rem] font-bold uppercase tracking-[0.16em] text-rose-ink">
                     What they really mean
                   </p>
-                  <p className="mt-2 font-serif text-xl leading-snug text-ink">
+                  <p className="mt-2 font-display text-xl leading-snug text-ink">
                     {s.decode.meaning}
                   </p>
                 </div>
@@ -116,12 +116,12 @@ export default function Landing() {
       {/* Built for how you read */}
       <section aria-labelledby="a11y" className="border-t border-line">
         <div className="mx-auto max-w-3xl px-5 py-16 sm:py-20">
-          <p className="text-[0.7rem] font-bold uppercase tracking-[0.18em] text-terracotta-ink">
+          <p className="text-[0.7rem] font-bold uppercase tracking-[0.18em] text-rose-ink">
             Built for how you read
           </p>
           <h2
             id="a11y"
-            className="mt-3 font-serif text-h1 leading-tight text-ink"
+            className="mt-3 font-display text-h1 leading-tight text-ink"
           >
             Made for neurodivergent minds first.
           </h2>
@@ -158,21 +158,21 @@ export default function Landing() {
       </section>
 
       {/* Privacy promise */}
-      <section className="border-t border-line bg-ink text-paper">
+      <section className="reveal-scan border-t border-line bg-plum text-on-plum">
         <div className="mx-auto max-w-3xl px-5 py-16 text-center sm:py-20">
-          <p className="text-[0.7rem] font-bold uppercase tracking-[0.18em] text-paper/60">
+          <p className="text-[0.7rem] font-bold uppercase tracking-[0.18em] text-on-plum-soft">
             The promise
           </p>
-          <p className="mx-auto mt-4 max-w-xl font-serif text-h1 leading-tight">
+          <p className="mx-auto mt-4 max-w-xl font-display text-h1 leading-tight">
             Your messages are yours. We never store them.
           </p>
-          <p className="mx-auto mt-4 max-w-md text-paper/70">
+          <p className="mx-auto mt-4 max-w-md text-on-plum-soft">
             Each message is read once to help you, then discarded. No account,
             no history, nothing kept on a server.
           </p>
           <Link
             href="/"
-            className="mt-8 inline-block rounded-chip bg-paper px-6 py-3 font-bold text-ink transition hover:bg-terracotta hover:text-paper"
+            className="mt-8 inline-block rounded-chip bg-paper px-6 py-3 font-bold text-ink transition hover:bg-rose hover:text-on-rose"
           >
             Try it now →
           </Link>

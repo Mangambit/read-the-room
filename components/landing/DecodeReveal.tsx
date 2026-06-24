@@ -1,13 +1,13 @@
 /**
- * The signature element. The product's actual concept made visual: a received
- * message, then the terracotta "marker" decodes the subtext underneath it.
- * Pure CSS animation (no JS) so it works as a server component and respects
- * the global reduced-motion rule.
+ * The signature element. The product's concept made visual: a normal message,
+ * then an x-ray that reveals the subtext underneath it. Pure CSS animation (no
+ * JS) so it works as a server component and respects the global reduced-motion
+ * rule.
  */
 export function DecodeReveal() {
   return (
     <figure className="relative mx-auto w-full max-w-md">
-      {/* The received message — a chat bubble with one squared corner */}
+      {/* The surface — what they said, a normal chat bubble */}
       <div className="animate-rise rounded-2xl rounded-bl-md border border-line bg-paper-raised p-5 shadow-soft">
         <p className="text-[0.7rem] font-bold uppercase tracking-[0.16em] text-ink-faint">
           Your professor · just now
@@ -21,35 +21,40 @@ export function DecodeReveal() {
         </p>
       </div>
 
-      {/* Connector */}
+      {/* Scan-line connector */}
       <div
         aria-hidden
-        className="ml-8 h-6 w-px bg-line"
+        className="my-1 ml-8 flex items-center gap-2"
         style={{ animation: "rise 0.4s var(--ease-out-expo) 0.5s both" }}
-      />
+      >
+        <span className="h-5 w-px border-l border-dashed border-rose" />
+        <span className="text-[0.65rem] font-bold uppercase tracking-[0.16em] text-rose-ink">
+          reading through ↓
+        </span>
+      </div>
 
-      {/* The decode */}
+      {/* The reveal — what they really mean, seen underneath */}
       <figcaption
-        className="rounded-2xl border-l-4 border-terracotta bg-paper-raised px-5 py-4 shadow-soft"
+        className="reveal-scan rounded-2xl bg-plum px-5 py-5 text-on-plum shadow-plum"
         style={{ animation: "rise 0.55s var(--ease-out-expo) 0.6s both" }}
       >
-        <p className="text-[0.7rem] font-bold uppercase tracking-[0.16em] text-terracotta-ink">
+        <p className="text-[0.7rem] font-bold uppercase tracking-[0.16em] text-on-plum-soft">
           What they really mean
         </p>
-        <p className="mt-1.5 font-serif text-xl leading-snug text-ink">
-          They&rsquo;re annoyed you&rsquo;re late and want it in now. The
-          &ldquo;extra support&rdquo; is a polite jab, not a real offer.
+        <p className="mt-1.5 font-display text-xl leading-snug text-on-plum">
+          They&rsquo;re annoyed you&rsquo;re late and want it in now. The{" "}
+          <span className="text-rose">&ldquo;extra support&rdquo;</span> is a
+          polite jab, not a real offer.
         </p>
-        <div className="mt-3 flex flex-wrap gap-2 text-sm text-ink-soft">
-          <span className="rounded-chip border border-line bg-paper px-2.5 py-0.5">
-            passive-aggressive
-          </span>
-          <span className="rounded-chip border border-line bg-paper px-2.5 py-0.5">
-            upset with you
-          </span>
-          <span className="rounded-chip border border-line bg-paper px-2.5 py-0.5">
-            high urgency
-          </span>
+        <div className="mt-3 flex flex-wrap gap-2 text-sm text-on-plum-soft">
+          {["passive-aggressive", "upset with you", "high urgency"].map((t) => (
+            <span
+              key={t}
+              className="rounded-chip border border-on-plum/20 bg-plum-raised px-2.5 py-0.5"
+            >
+              {t}
+            </span>
+          ))}
         </div>
       </figcaption>
     </figure>

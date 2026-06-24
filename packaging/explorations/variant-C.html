@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Read the Room — Decode result</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Hanken+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --page: #EEF0F4;
+    --surface: #FFFFFF;
+    --ink: #232733;
+    --indigo: #4C5BD4;
+    --calm: #5BA8C4;
+    --caution: #E0A33E;
+    --heat: #D5564B;
+    --muted: #5A6172;
+    --hairline: #DDE1EA;
+
+    --radius-lg: 22px;
+    --radius-md: 14px;
+    --radius-sm: 10px;
+
+    --shadow-soft: 0 1px 2px rgba(35,39,51,.04), 0 8px 24px rgba(35,39,51,.06);
+    --shadow-card: 0 1px 2px rgba(35,39,51,.05), 0 18px 48px rgba(35,39,51,.10);
+
+    --space: clamp(1rem, .6rem + 1vw, 1.6rem);
+
+    --font-display: "Hanken Grotesk", system-ui, sans-serif;
+    --font-body: "Atkinson Hyperlegible", system-ui, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body { margin: 0; padding: 0; }
+
+  body {
+    background-color: var(--page);
+    background-image:
+      radial-gradient(1100px 520px at 78% -8%, rgba(76,91,212,.06), transparent 60%),
+      radial-gradient(900px 480px at 8% 110%, rgba(91,168,196,.07), transparent 55%);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 48px 24px 72px;
+  }
+
+  h1, h2, h3, .display { font-family: var(--font-display); letter-spacing: -0.015em; }
+
+  .shell { width: 100%; max-width: 760px; }
+
+  /* ---------- App chrome ---------- */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 22px;
+    padding: 0 4px;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+  }
+  .brand-mark {
+    width: 34px; height: 34px;
+    border-radius: 10px;
+    background: linear-gradient(150deg, var(--calm) 0%, var(--caution) 52%, var(--heat) 100%);
+    position: relative;
+    box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.35), 0 4px 12px rgba(213,86,75,.22);
+  }
+  .brand-mark::after {
+    content: "";
+    position: absolute;
+    top: 50%; left: 64%;
+    width: 7px; height: 7px;
+    transform: translate(-50%,-50%);
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 0 2.5px rgba(35,39,51,.25);
+  }
+  .brand-name { font-family: var(--font-display); font-weight: 800; font-size: 1.05rem; }
+  .brand-name span { color: var(--muted); font-weight: 600; }
+  .topbar .status {
+    font-size: .82rem;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .status .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--calm);
+    box-shadow: 0 0 0 3px rgba(91,168,196,.18);
+  }
+
+  /* ---------- Main card ---------- */
+  .card {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    border: 1px solid var(--hairline);
+    overflow: hidden;
+  }
+  .card-pad { padding: clamp(22px, 3vw, 34px); }
+
+  /* ---------- Received message ---------- */
+  .received {
+    border-bottom: 1px solid var(--hairline);
+  }
+  .sender {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .avatar {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(150deg, #ECEFFb, #DCE0F4);
+    color: var(--indigo);
+    display: grid; place-items: center;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: .95rem;
+    border: 1px solid var(--hairline);
+  }
+  .sender-meta { line-height: 1.25; }
+  .sender-name { font-family: var(--font-display); font-weight: 700; font-size: .96rem; }
+  .sender-time { font-size: .8rem; color: var(--muted); }
+  .kicker {
+    text-transform: uppercase;
+    letter-spacing: .14em;
+    font-size: .68rem;
+    font-weight: 700;
+    color: var(--muted);
+    margin: 0 0 9px;
+  }
+  blockquote.msg {
+    margin: 0;
+    padding: 16px 18px;
+    background: #F6F7FB;
+    border: 1px solid var(--hairline);
+    border-left: 3px solid var(--indigo);
+    border-radius: 12px;
+    font-size: 1.04rem;
+    line-height: 1.5;
+    color: #353B4A;
+  }
+
+  /* ---------- Spectrum (hero) ---------- */
+  .spectrum-block {
+    background: linear-gradient(180deg, #FBFCFE 0%, #FFFFFF 100%);
+    border-bottom: 1px solid var(--hairline);
+  }
+  .spectrum-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .spectrum-head h1 {
+    margin: 0;
+    font-weight: 800;
+    font-size: clamp(1.35rem, 1rem + 1.6vw, 1.85rem);
+  }
+  .spectrum-head .land {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(213,86,75,.10);
+    color: var(--heat);
+    border: 1px solid rgba(213,86,75,.28);
+    padding: 6px 13px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: .85rem;
+  }
+  .land .pulse {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--heat);
+    box-shadow: 0 0 0 3px rgba(213,86,75,.18);
+  }
+
+  /* the scale */
+  .scale {
+    position: relative;
+    padding-top: 46px;   /* room for marker */
+    padding-bottom: 8px;
+  }
+  .bar {
+    position: relative;
+    height: 18px;
+    border-radius: 999px;
+    background: linear-gradient(90deg,
+      var(--calm) 0%,
+      #7FB9B6 26%,
+      var(--caution) 56%,
+      #D97A4A 78%,
+      var(--heat) 100%);
+    box-shadow: inset 0 1px 2px rgba(255,255,255,.45), inset 0 -1px 3px rgba(35,39,51,.12);
+  }
+  /* subtle tick segmentation so it reads as a calibrated scale, not a blob */
+  .bar::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background-image: repeating-linear-gradient(90deg,
+      rgba(255,255,255,0) 0,
+      rgba(255,255,255,0) calc(25% - 1.5px),
+      rgba(255,255,255,.55) calc(25% - 1.5px),
+      rgba(255,255,255,.55) 25%);
+    pointer-events: none;
+  }
+
+  .marker {
+    position: absolute;
+    left: 79%;           /* tense/heated end */
+    top: 0;
+    transform: translateX(-50%);
+    text-align: center;
+  }
+  .marker-label {
+    display: inline-block;
+    background: var(--ink);
+    color: #fff;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: .8rem;
+    padding: 6px 12px;
+    border-radius: 9px;
+    white-space: nowrap;
+    box-shadow: 0 6px 16px rgba(35,39,51,.22);
+    position: relative;
+  }
+  .marker-label::after {
+    content: "";
+    position: absolute;
+    left: 50%; bottom: -5px;
+    width: 10px; height: 10px;
+    background: var(--ink);
+    transform: translateX(-50%) rotate(45deg);
+    border-radius: 2px;
+  }
+  .marker-pin {
+    position: absolute;
+    left: 50%; top: 38px;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 30px;
+    background: var(--ink);
+    border-radius: 4px;
+  }
+  .marker-pin::after {
+    content: "";
+    position: absolute;
+    left: 50%; top: 24px;
+    transform: translate(-50%, 0);
+    width: 16px; height: 16px;
+    background: #fff;
+    border: 4px solid var(--ink);
+    border-radius: 50%;
+    box-shadow: 0 4px 10px rgba(35,39,51,.25);
+  }
+
+  .scale-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 16px;
+    font-size: .78rem;
+    color: var(--muted);
+    font-weight: 700;
+  }
+  .scale-labels span { display: flex; align-items: center; gap: 6px; }
+  .swatch { width: 9px; height: 9px; border-radius: 3px; }
+  .sw-calm { background: var(--calm); }
+  .sw-caution { background: var(--caution); }
+  .sw-heat { background: var(--heat); }
+
+  /* ---------- Decoded meaning ---------- */
+  .decoded p {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(1.25rem, 1rem + 1.3vw, 1.7rem);
+    line-height: 1.32;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .decoded .jab { color: var(--heat); }
+
+  /* ---------- Read-out grid ---------- */
+  .readouts {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    margin-top: 6px;
+  }
+  .tile {
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius-md);
+    padding: 16px 17px;
+    background: #FBFCFE;
+  }
+  .tile.wide { grid-column: 1 / -1; }
+  .tile .label {
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    font-size: .66rem;
+    font-weight: 700;
+    color: var(--muted);
+    margin-bottom: 9px;
+  }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: #fff;
+    border: 1px solid var(--hairline);
+    border-radius: 999px;
+    padding: 6px 12px 6px 10px;
+    font-size: .85rem;
+    font-weight: 700;
+    color: #3A4150;
+  }
+  .chip .glyph {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--caution);
+  }
+  .chip.frustrated .glyph { background: var(--heat); }
+
+  /* confidence meter */
+  .conf-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 9px;
+  }
+  .conf-val {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 1.3rem;
+    color: var(--ink);
+  }
+  .meter {
+    height: 9px;
+    border-radius: 999px;
+    background: #E7EAF1;
+    overflow: hidden;
+    position: relative;
+  }
+  .meter-fill {
+    height: 100%;
+    width: 88%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--indigo), #6E7CE6);
+  }
+  .meter-ticks {
+    position: absolute;
+    inset: 0;
+    background-image: repeating-linear-gradient(90deg,
+      rgba(255,255,255,0) 0,
+      rgba(255,255,255,0) calc(10% - 1px),
+      rgba(255,255,255,.7) calc(10% - 1px),
+      rgba(255,255,255,.7) 10%);
+    pointer-events: none;
+  }
+
+  /* yes/no + urgency emphasis */
+  .stat-line {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .stat-value {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 1.3rem;
+  }
+  .stat-value.yes { color: var(--heat); }
+  .stat-value.high { color: var(--caution); }
+  .stat-badge {
+    font-size: .72rem;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 999px;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+  }
+  .stat-badge.yes { background: rgba(213,86,75,.12); color: var(--heat); }
+  .stat-badge.high { background: rgba(224,163,62,.16); color: #B97E1F; }
+
+  .want-text {
+    font-size: 1rem;
+    color: #353B4A;
+    line-height: 1.45;
+  }
+
+  /* ---------- Reply card ---------- */
+  .reply {
+    background:
+      linear-gradient(180deg, rgba(76,91,212,.05), rgba(76,91,212,0) 70%),
+      var(--surface);
+    border-top: 1px solid var(--hairline);
+  }
+  .reply-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+    gap: 12px;
+  }
+  .reply-head h2 {
+    margin: 0;
+    font-weight: 800;
+    font-size: 1.15rem;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+  }
+  .reply-head h2 .tag {
+    font-size: .7rem;
+    font-weight: 700;
+    color: var(--indigo);
+    background: rgba(76,91,212,.10);
+    border: 1px solid rgba(76,91,212,.22);
+    padding: 3px 10px;
+    border-radius: 999px;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    font-family: var(--font-body);
+  }
+  .draft {
+    background: #F6F7FB;
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius-md);
+    padding: 18px 20px;
+    font-size: 1.04rem;
+    line-height: 1.6;
+    color: #2D3240;
+  }
+  .reply-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 16px;
+  }
+  .btn {
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: .95rem;
+    border-radius: var(--radius-sm);
+    padding: 12px 20px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+  }
+  .btn-primary {
+    background: var(--indigo);
+    color: #fff;
+    box-shadow: 0 6px 18px rgba(76,91,212,.28);
+  }
+  .btn-primary:hover { background: #4150C6; transform: translateY(-1px); box-shadow: 0 9px 24px rgba(76,91,212,.34); }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-primary:focus-visible { outline: 3px solid rgba(76,91,212,.45); outline-offset: 2px; }
+  .btn-ghost {
+    background: #fff;
+    color: var(--ink);
+    border-color: var(--hairline);
+  }
+  .btn-ghost:hover { border-color: #C4CAD8; background: #FBFCFE; }
+  .btn-ghost:focus-visible { outline: 3px solid rgba(35,39,51,.25); outline-offset: 2px; }
+  .reply-actions .note {
+    margin-left: auto;
+    font-size: .8rem;
+    color: var(--muted);
+  }
+
+  .icon { width: 16px; height: 16px; display: inline-block; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* footer reassurance */
+  .footnote {
+    text-align: center;
+    margin-top: 18px;
+    font-size: .8rem;
+    color: var(--muted);
+  }
+
+  @media (max-width: 560px) {
+    .readouts { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+  <main class="shell">
+    <div class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true"></div>
+        <div class="brand-name">Read the Room <span>· decode</span></div>
+      </div>
+      <div class="status"><span class="dot" aria-hidden="true"></span> Read for you, privately</div>
+    </div>
+
+    <article class="card">
+
+      <!-- Received message -->
+      <section class="card-pad received" aria-labelledby="received-h">
+        <p class="kicker" id="received-h">The message</p>
+        <div class="sender">
+          <div class="avatar" aria-hidden="true">P</div>
+          <div class="sender-meta">
+            <div class="sender-name">Your professor</div>
+            <div class="sender-time">just now</div>
+          </div>
+        </div>
+        <blockquote class="msg">
+          “Per my last email, the assignment was due Friday. Let me know if you need extra support managing deadlines going forward.”
+        </blockquote>
+      </section>
+
+      <!-- Spectrum hero -->
+      <section class="card-pad spectrum-block" aria-labelledby="spectrum-h">
+        <div class="spectrum-head">
+          <h1 id="spectrum-h">Where this lands</h1>
+          <span class="land"><span class="pulse" aria-hidden="true"></span>Tense · likely upset</span>
+        </div>
+
+        <div class="scale" role="img" aria-label="Emotional tone spectrum from calm to heated. This message lands in the tense range, toward the heated end.">
+          <div class="marker">
+            <span class="marker-label">Tense · likely upset</span>
+            <span class="marker-pin" aria-hidden="true"></span>
+          </div>
+          <div class="bar" aria-hidden="true"></div>
+          <div class="scale-labels">
+            <span><span class="swatch sw-calm" aria-hidden="true"></span>Calm</span>
+            <span><span class="swatch sw-caution" aria-hidden="true"></span>Tense</span>
+            <span><span class="swatch sw-heat" aria-hidden="true"></span>Heated</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Decoded meaning -->
+      <section class="card-pad decoded" aria-labelledby="decoded-h">
+        <p class="kicker" id="decoded-h">What they really mean</p>
+        <p>
+          They’re annoyed you missed the deadline and reminding you they already told you once.
+          <span class="jab">The “extra support” is a polite jab</span>, not a real offer.
+        </p>
+      </section>
+
+      <!-- Read-outs -->
+      <section class="card-pad" aria-label="Tone read-outs">
+        <div class="readouts">
+          <div class="tile">
+            <div class="label">Tone detected</div>
+            <div class="chips">
+              <span class="chip"><span class="glyph" aria-hidden="true"></span>passive-aggressive</span>
+              <span class="chip frustrated"><span class="glyph" aria-hidden="true"></span>frustrated</span>
+            </div>
+          </div>
+
+          <div class="tile">
+            <div class="label">Confidence</div>
+            <div class="conf-head">
+              <span class="conf-val">88%</span>
+              <span style="font-size:.78rem;color:var(--muted);font-weight:700;">high certainty</span>
+            </div>
+            <div class="meter" aria-hidden="true">
+              <div class="meter-fill"></div>
+              <div class="meter-ticks"></div>
+            </div>
+          </div>
+
+          <div class="tile">
+            <div class="label">Upset with you?</div>
+            <div class="stat-line">
+              <span class="stat-value yes">Yes</span>
+              <span class="stat-badge yes">clear signal</span>
+            </div>
+          </div>
+
+          <div class="tile">
+            <div class="label">Urgency</div>
+            <div class="stat-line">
+              <span class="stat-value high">High</span>
+              <span class="stat-badge high">respond soon</span>
+            </div>
+          </div>
+
+          <div class="tile wide">
+            <div class="label">What they want from you</div>
+            <p class="want-text">A short, sincere apology and the assignment submitted now.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Reply -->
+      <section class="card-pad reply" aria-labelledby="reply-h">
+        <div class="reply-head">
+          <h2 id="reply-h">Your reply <span class="tag">warm</span></h2>
+        </div>
+        <p class="draft">
+          Hi Professor — you’re right, and I’m sorry I missed Friday. That’s on me. I’m submitting it today and I’ve set reminders so it won’t happen again. Thank you for the nudge.
+        </p>
+        <div class="reply-actions">
+          <button class="btn btn-primary" type="button">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+            Copy reply
+          </button>
+          <button class="btn btn-ghost" type="button">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4v6h6"/><path d="M20 20v-6h-6"/><path d="M5 14a7 7 0 0 0 13 2"/><path d="M19 10A7 7 0 0 0 6 8"/></svg>
+            Adjust tone
+          </button>
+          <span class="note">Edit before you send — it’s your voice.</span>
+        </div>
+      </section>
+
+    </article>
+
+    <p class="footnote">Read the Room decodes tone privately on your side. Nothing is sent until you choose to.</p>
+  </main>
+</body>
+</html>

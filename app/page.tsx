@@ -7,15 +7,15 @@ export default function Home() {
         <div className="flex items-baseline gap-2">
           <span
             aria-hidden
-            className="h-2.5 w-2.5 rounded-full bg-terracotta"
+            className="h-2.5 w-2.5 rounded-full bg-rose"
           />
-          <h1 className="font-serif text-lg font-semibold tracking-tight text-ink">
+          <h1 className="font-display text-lg font-semibold tracking-tight text-ink">
             Read the Room
           </h1>
         </div>
-        <p className="mt-3 font-serif text-h1 leading-tight text-ink">
+        <p className="mt-3 font-display text-h1 leading-tight text-ink">
           Understand what they{" "}
-          <span className="italic text-terracotta">really</span> mean.
+          <span className="italic text-rose">really</span> mean.
         </p>
         <p className="mt-2 max-w-prose text-ink-soft">
           Paste a message that&rsquo;s hard to read. Get the tone, the hidden

@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Read the Room — Decode result</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@500;600;700;800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --page:        #ECEAE6;
+    --chat:        #FFFFFF;
+    --plum:        #3A2A4D;
+    --plum-deep:   #2C1F3B;
+    --plum-text:   #F3EEF6;
+    --rose:        #C9608F;
+    --ink:         #262329;
+    --muted:       #6B6570;
+    --hair:        #DED9D3;
+
+    --font-display: "Schibsted Grotesk", system-ui, sans-serif;
+    --font-body: "Atkinson Hyperlegible", system-ui, sans-serif;
+
+    --r-lg: 24px;
+    --r-md: 18px;
+    --r-sm: 12px;
+
+    --shadow-soft: 0 1px 2px rgba(38,35,41,.04), 0 8px 24px rgba(38,35,41,.07);
+    --shadow-plum: 0 18px 48px rgba(44,31,59,.34), 0 4px 12px rgba(44,31,59,.22);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body { margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font-body);
+    background-color: var(--page);
+    background-image:
+      radial-gradient(1200px 600px at 78% -10%, rgba(201,96,143,.10), transparent 60%),
+      radial-gradient(900px 500px at 5% 110%, rgba(58,42,77,.08), transparent 60%);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    min-height: 100vh;
+  }
+
+  h1, h2, h3, .display { font-family: var(--font-display); }
+
+  .wrap {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 48px 64px;
+  }
+
+  /* ---------- top bar ---------- */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 36px;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .brand-mark {
+    width: 38px; height: 38px;
+    border-radius: 11px;
+    background: linear-gradient(150deg, var(--plum), var(--rose));
+    display: grid;
+    place-items: center;
+    box-shadow: 0 6px 16px rgba(58,42,77,.30);
+    position: relative;
+  }
+  .brand-mark::after {
+    content: "";
+    position: absolute;
+    inset: 9px;
+    border-radius: 50%;
+    border: 2px solid rgba(243,238,246,.85);
+  }
+  .brand-mark::before {
+    content: "";
+    position: absolute;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--plum-text);
+    z-index: 1;
+  }
+  .brand-name {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 19px;
+    letter-spacing: -.01em;
+  }
+  .brand-name span { color: var(--rose); }
+  .topbar-meta {
+    font-size: 13px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--rose);
+    box-shadow: 0 0 0 4px rgba(201,96,143,.16);
+  }
+
+  /* ---------- heading ---------- */
+  .lede {
+    margin-bottom: 30px;
+    max-width: 720px;
+  }
+  .kicker {
+    display: inline-block;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--rose);
+    margin-bottom: 12px;
+  }
+  .lede h1 {
+    margin: 0 0 8px;
+    font-size: 38px;
+    line-height: 1.05;
+    font-weight: 800;
+    letter-spacing: -.025em;
+    color: var(--ink);
+  }
+  .lede p {
+    margin: 0;
+    font-size: 16px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* ---------- layout ---------- */
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 32px;
+    align-items: start;
+  }
+
+  /* ---------- the scan stack ---------- */
+  .scan {
+    position: relative;
+  }
+
+  .sender {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    margin-bottom: 14px;
+    padding-left: 4px;
+  }
+  .avatar {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(150deg, #b6abc4, #8d7fa0);
+    display: grid; place-items: center;
+    color: #fff;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 14px;
+    flex: none;
+  }
+  .sender-text { line-height: 1.2; }
+  .sender-name {
+    font-weight: 700;
+    font-size: 14.5px;
+    color: var(--ink);
+  }
+  .sender-sub { font-size: 12.5px; color: var(--muted); }
+
+  /* received bubble (normal layer) */
+  .bubble {
+    position: relative;
+    background: var(--chat);
+    border: 1px solid var(--hair);
+    border-radius: var(--r-lg);
+    border-top-left-radius: 6px;
+    padding: 20px 24px;
+    max-width: 560px;
+    box-shadow: var(--shadow-soft);
+    font-size: 17px;
+    line-height: 1.5;
+    color: var(--ink);
+    z-index: 3;
+  }
+  .bubble .scan-tag {
+    position: absolute;
+    top: -11px; right: 18px;
+    background: var(--plum);
+    color: var(--plum-text);
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 10.5px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    padding: 5px 10px;
+    border-radius: 999px;
+    display: flex; align-items: center; gap: 6px;
+    box-shadow: 0 4px 12px rgba(58,42,77,.28);
+  }
+  .scan-tag::before {
+    content:"";
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--rose);
+    box-shadow: 0 0 0 3px rgba(201,96,143,.35);
+  }
+
+  /* the connector showing "seeing through" */
+  .through {
+    position: relative;
+    height: 30px;
+    margin-left: 40px;
+  }
+  .through::before {
+    content:"";
+    position: absolute;
+    left: 0; top: -6px; bottom: -6px;
+    width: 2px;
+    background: repeating-linear-gradient(
+      to bottom,
+      var(--rose) 0 5px,
+      transparent 5px 11px
+    );
+  }
+  .through-label {
+    position: absolute;
+    left: 18px; top: 50%;
+    transform: translateY(-50%);
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--rose);
+  }
+
+  /* X-RAY plum reveal panel */
+  .xray {
+    position: relative;
+    margin-top: -2px;
+    background:
+      linear-gradient(180deg, var(--plum) 0%, var(--plum-deep) 100%);
+    color: var(--plum-text);
+    border-radius: var(--r-lg);
+    border-top-left-radius: 8px;
+    padding: 26px 28px 28px;
+    box-shadow: var(--shadow-plum);
+    overflow: hidden;
+    max-width: 620px;
+  }
+  /* scan-line texture */
+  .xray::before {
+    content:"";
+    position: absolute;
+    inset: 0;
+    background-image: repeating-linear-gradient(
+      to bottom,
+      rgba(243,238,246,.05) 0 1px,
+      transparent 1px 6px
+    );
+    pointer-events: none;
+    mix-blend-mode: screen;
+  }
+  /* soft rose scan glow sweeping down */
+  .xray::after {
+    content:"";
+    position: absolute;
+    left: 0; right: 0; top: 0;
+    height: 120px;
+    background: linear-gradient(180deg, rgba(201,96,143,.22), transparent);
+    pointer-events: none;
+  }
+  .xray > * { position: relative; z-index: 1; }
+
+  .xray-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .xray-eye {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(243,238,246,.6);
+    display: grid; place-items: center;
+    flex: none;
+  }
+  .xray-eye::after {
+    content:"";
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--rose);
+    box-shadow: 0 0 8px var(--rose);
+  }
+  .xray-head h2 {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: rgba(243,238,246,.78);
+  }
+
+  .decoded {
+    font-size: 19px;
+    line-height: 1.55;
+    font-weight: 400;
+    color: var(--plum-text);
+    margin: 0;
+  }
+  .decoded mark {
+    background: transparent;
+    color: #fff;
+    font-weight: 700;
+    border-bottom: 2px solid var(--rose);
+    padding-bottom: 1px;
+  }
+  .decoded .rose {
+    color: var(--rose);
+    font-weight: 700;
+  }
+
+  /* tone chips inside reveal */
+  .tones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+    margin-top: 20px;
+    padding-top: 18px;
+    border-top: 1px solid rgba(243,238,246,.14);
+  }
+  .chip {
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 13px;
+    padding: 7px 13px;
+    border-radius: 999px;
+    background: rgba(201,96,143,.20);
+    color: #F8E6EF;
+    border: 1px solid rgba(201,96,143,.45);
+  }
+  .chip.ghost {
+    background: rgba(243,238,246,.07);
+    color: rgba(243,238,246,.82);
+    border-color: rgba(243,238,246,.18);
+  }
+
+  /* ---------- side readout ---------- */
+  .readout {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    position: sticky;
+    top: 32px;
+  }
+
+  .card {
+    background: var(--chat);
+    border: 1px solid var(--hair);
+    border-radius: var(--r-md);
+    padding: 18px 20px;
+    box-shadow: var(--shadow-soft);
+  }
+  .card-label {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  /* confidence */
+  .conf-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .conf-num {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 34px;
+    letter-spacing: -.02em;
+    color: var(--plum);
+    line-height: 1;
+  }
+  .conf-word { font-size: 13px; color: var(--muted); }
+  .meter {
+    height: 9px;
+    border-radius: 999px;
+    background: var(--hair);
+    overflow: hidden;
+  }
+  .meter > i {
+    display: block;
+    height: 100%;
+    width: 88%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--plum), var(--rose));
+  }
+
+  /* fact rows */
+  .facts { display: flex; flex-direction: column; }
+  .fact {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--hair);
+  }
+  .fact:last-child { border-bottom: none; padding-bottom: 0; }
+  .fact:first-child { padding-top: 0; }
+  .fact-k { font-size: 14px; color: var(--muted); }
+  .fact-v {
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--ink);
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .pill {
+    font-weight: 700;
+    font-size: 12.5px;
+    padding: 4px 11px;
+    border-radius: 999px;
+    letter-spacing: .01em;
+  }
+  .pill.yes  { background: rgba(201,96,143,.16); color: #9c3c69; }
+  .pill.high { background: rgba(58,42,77,.12);  color: var(--plum); }
+
+  .want {
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--ink);
+    margin: 0;
+  }
+  .want strong { color: var(--plum); }
+
+  /* ---------- reply layer (back to light) ---------- */
+  .reply {
+    margin-top: 38px;
+    grid-column: 1 / -1;
+  }
+  .reply-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .reply-head h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 20px;
+    letter-spacing: -.01em;
+    color: var(--ink);
+  }
+  .reply-head .badge {
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 11.5px;
+    color: var(--rose);
+    background: rgba(201,96,143,.12);
+    border: 1px solid rgba(201,96,143,.30);
+    padding: 4px 10px;
+    border-radius: 999px;
+    letter-spacing: .02em;
+  }
+
+  .reply-card {
+    display: flex;
+    align-items: flex-end;
+    gap: 18px;
+    flex-wrap: wrap;
+  }
+  .reply-bubble {
+    flex: 1 1 520px;
+    position: relative;
+    background: var(--chat);
+    border: 1px solid var(--hair);
+    border-radius: var(--r-lg);
+    border-bottom-right-radius: 6px;
+    padding: 22px 26px;
+    font-size: 17px;
+    line-height: 1.55;
+    color: var(--ink);
+    box-shadow: var(--shadow-soft);
+  }
+  .reply-bubble::before {
+    content: "You · draft";
+    position: absolute;
+    top: -10px; left: 20px;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 10.5px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: var(--page);
+    padding: 0 8px;
+  }
+
+  .reply-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+  }
+  .btn {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 15px;
+    border: none;
+    border-radius: 14px;
+    padding: 14px 22px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+  }
+  .btn-primary {
+    background: var(--plum);
+    color: var(--plum-text);
+    box-shadow: 0 8px 20px rgba(58,42,77,.30);
+  }
+  .btn-primary:hover {
+    background: var(--plum-deep);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 26px rgba(58,42,77,.36);
+  }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-primary:focus-visible {
+    outline: 3px solid var(--rose);
+    outline-offset: 3px;
+  }
+  .btn-ghost {
+    background: transparent;
+    color: var(--plum);
+    border: 1.5px solid var(--hair);
+  }
+  .btn-ghost:hover { border-color: var(--plum); background: rgba(58,42,77,.04); }
+  .btn-ghost:focus-visible { outline: 3px solid var(--rose); outline-offset: 2px; }
+
+  .ico { width: 17px; height: 17px; display: inline-block; }
+
+  @media (max-width: 980px) {
+    .grid { grid-template-columns: 1fr; }
+    .readout { position: static; }
+    .wrap { padding: 32px 24px 48px; }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+
+    <!-- top bar -->
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true"></div>
+        <div class="brand-name">Read the <span>Room</span></div>
+      </div>
+      <div class="topbar-meta">
+        <span class="dot" aria-hidden="true"></span>
+        Decoded · we read it twice so you don't have to
+      </div>
+    </header>
+
+    <!-- lede -->
+    <div class="lede">
+      <span class="kicker">X-ray reading</span>
+      <h1>Here's what's really underneath.</h1>
+      <p>We scanned through the surface message to the meaning hiding below it. Take a breath — you're not imagining the tone.</p>
+    </div>
+
+    <main class="grid">
+
+      <!-- left: the scan stack -->
+      <section class="scan" aria-label="Decoded message">
+
+        <div class="sender">
+          <div class="avatar" aria-hidden="true">P</div>
+          <div class="sender-text">
+            <div class="sender-name">Your professor</div>
+            <div class="sender-sub">just now</div>
+          </div>
+        </div>
+
+        <!-- received bubble (surface layer) -->
+        <article class="bubble">
+          <span class="scan-tag" aria-hidden="true">scanned</span>
+          Per my last email, the assignment was due Friday. Let me know if you need extra support managing deadlines going forward.
+        </article>
+
+        <!-- "seeing through" connector -->
+        <div class="through" aria-hidden="true">
+          <span class="through-label">reading through ↓</span>
+        </div>
+
+        <!-- x-ray plum reveal -->
+        <article class="xray" aria-label="Hidden meaning">
+          <div class="xray-head">
+            <span class="xray-eye" aria-hidden="true"></span>
+            <h2>What they actually mean</h2>
+          </div>
+
+          <p class="decoded">
+            They're <mark>annoyed you missed the deadline</mark> and reminding you they already told you once. The <span class="rose">"extra support"</span> is a polite jab, not a real offer.
+          </p>
+
+          <div class="tones" role="list" aria-label="Detected tone">
+            <span class="chip" role="listitem">passive-aggressive</span>
+            <span class="chip" role="listitem">frustrated</span>
+            <span class="chip ghost" role="listitem">disappointed, not hostile</span>
+          </div>
+        </article>
+      </section>
+
+      <!-- right: readout -->
+      <aside class="readout" aria-label="Read-out">
+
+        <div class="card">
+          <div class="card-label">Confidence</div>
+          <div class="conf-row">
+            <span class="conf-num">88%</span>
+            <span class="conf-word">fairly sure</span>
+          </div>
+          <div class="meter" role="img" aria-label="Confidence 88 percent"><i></i></div>
+        </div>
+
+        <div class="card">
+          <div class="card-label">Quick read</div>
+          <div class="facts">
+            <div class="fact">
+              <span class="fact-k">Upset with you?</span>
+              <span class="fact-v"><span class="pill yes">Yes</span></span>
+            </div>
+            <div class="fact">
+              <span class="fact-k">Urgency</span>
+              <span class="fact-v"><span class="pill high">High</span></span>
+            </div>
+            <div class="fact">
+              <span class="fact-k">Tone</span>
+              <span class="fact-v">Passive-aggressive</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-label">What they want</div>
+          <p class="want"><strong>A short, sincere apology</strong> and the assignment submitted now.</p>
+        </div>
+
+      </aside>
+
+      <!-- reply layer, back in the normal light layer -->
+      <section class="reply" aria-label="Your reply">
+        <div class="reply-head">
+          <h2>Your reply</h2>
+          <span class="badge">warm tone</span>
+        </div>
+        <div class="reply-card">
+          <article class="reply-bubble">
+            Hi Professor — you're right, and I'm sorry I missed Friday. That's on me. I'm submitting it today and I've set reminders so it won't happen again. Thank you for the nudge.
+          </article>
+          <div class="reply-actions">
+            <button class="btn btn-primary" type="button">
+              <svg class="ico" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <rect x="9" y="9" width="11" height="11" rx="2.5" stroke="currentColor" stroke-width="2"/>
+                <path d="M5 15H4.5A1.5 1.5 0 0 1 3 13.5V4.5A1.5 1.5 0 0 1 4.5 3h9A1.5 1.5 0 0 1 15 4.5V5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              Copy reply
+            </button>
+            <button class="btn btn-ghost" type="button">Adjust tone</button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</body>
+</html>

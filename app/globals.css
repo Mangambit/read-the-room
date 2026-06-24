@@ -1,52 +1,59 @@
 @import "tailwindcss";
 
 /* ─────────────────────────────────────────────────────────────
-   Read the Room — warm editorial design system
-   Direction: a thoughtful magazine meets a calm journaling app.
-   Palette in oklch for perceptual consistency. Two real typefaces:
-   Fraunces (serif, the "meaning" moments) + Atkinson Hyperlegible
-   (sans UI — which doubles as the dyslexia-friendly accessibility font).
+   Read the Room — "X-ray" design system
+   Concept: the surface (a light, warm chat) is what they SAID; the deep-plum
+   reveal layer is what they MEANT. Light + calm by default, dramatic only in
+   the reveal. Display: Schibsted Grotesk. Body/UI + accessibility: Atkinson
+   Hyperlegible.
    ───────────────────────────────────────────────────────────── */
 
 @theme {
-  --color-paper: oklch(98.2% 0.006 83);
-  --color-paper-raised: oklch(96.3% 0.009 78);
-  --color-paper-sunk: oklch(94.6% 0.011 76);
-  --color-ink: oklch(28% 0.021 58);
-  --color-ink-soft: oklch(46% 0.018 58);
-  --color-ink-faint: oklch(62% 0.014 60);
-  --color-line: oklch(89% 0.012 72);
+  /* Surfaces — warm neutral, never cream */
+  --color-paper: #eceae6;
+  --color-paper-raised: #ffffff;
+  --color-paper-sunk: #e3dfd9;
+  --color-ink: #262329;
+  --color-ink-soft: #5f5a63;
+  --color-ink-faint: #8b8690;
+  --color-line: #ded9d3;
 
-  --color-terracotta: oklch(60% 0.142 38);
-  --color-terracotta-ink: oklch(47% 0.13 38);
-  --color-terracotta-soft: oklch(93% 0.04 46);
-  --color-sage: oklch(58% 0.062 158);
-  --color-sage-ink: oklch(46% 0.07 158);
-  --color-sage-soft: oklch(93.5% 0.03 158);
-  --color-amber: oklch(78% 0.114 74);
-  --color-amber-ink: oklch(52% 0.1 74);
-  --color-flag: oklch(52% 0.16 30);
+  /* The reveal layer — deep plum (the hidden meaning) */
+  --color-plum: #3a2a4d;
+  --color-plum-raised: #46355a;
+  --color-on-plum: #f4eff7;
+  --color-on-plum-soft: #c8bcd2;
 
-  --text-meaning: clamp(1.5rem, 1.1rem + 1.6vw, 1.9rem);
-  --text-h1: clamp(2rem, 1.4rem + 3vw, 3rem);
-  --text-display: clamp(2.75rem, 1.6rem + 5vw, 5rem);
+  /* Accent — orchid/rose, the highlight that decodes */
+  --color-rose: #c9608f;
+  --color-rose-ink: #a23a6b; /* AA on light surfaces */
+  --color-rose-soft: #f4dde8;
+  --color-on-rose: #ffffff;
 
-  --font-serif: var(--font-fraunces), Georgia, serif;
+  /* Semantic read-outs (temperature: calm → caution → heat) */
+  --color-calm: #3f7d66;
+  --color-caution: #bf8526;
+  --color-heat: #b8443f;
+
+  --font-display: var(--font-schibsted), ui-sans-serif, system-ui, sans-serif;
   --font-sans: var(--font-atkinson), ui-sans-serif, system-ui, sans-serif;
 
   --radius-card: 1.25rem;
   --radius-chip: 999px;
 
-  --shadow-soft: 0 1px 2px oklch(28% 0.02 58 / 0.04),
-    0 8px 24px oklch(28% 0.02 58 / 0.06);
-  --shadow-lift: 0 2px 4px oklch(28% 0.02 58 / 0.06),
-    0 18px 48px oklch(28% 0.02 58 / 0.1);
+  --shadow-soft: 0 1px 2px rgb(38 35 41 / 0.05), 0 10px 28px rgb(38 35 41 / 0.07);
+  --shadow-lift: 0 2px 4px rgb(38 35 41 / 0.07), 0 22px 50px rgb(38 35 41 / 0.12);
+  --shadow-plum: 0 14px 40px rgb(58 42 77 / 0.28);
+
+  --text-meaning: clamp(1.5rem, 1.1rem + 1.6vw, 1.95rem);
+  --text-h1: clamp(2rem, 1.4rem + 3vw, 3rem);
+  --text-display: clamp(2.75rem, 1.6rem + 5vw, 5rem);
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 :root {
-  --grain-opacity: 0.035;
+  --grain-opacity: 0.03;
 }
 
 html {
@@ -63,7 +70,7 @@ body {
   min-height: 100dvh;
 }
 
-/* Subtle paper grain for atmosphere (compositor-friendly, fixed) */
+/* Subtle paper grain */
 body::before {
   content: "";
   position: fixed;
@@ -74,28 +81,45 @@ body::before {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-/* ── Accessibility modes (toggled by data-attrs on <html> in Phase 4) ── */
+/* ── The reveal layer: a faint scan texture over plum ── */
+.reveal-scan {
+  position: relative;
+  isolation: isolate;
+}
+.reveal-scan::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: inherit;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 5px,
+    rgb(255 255 255 / 0.025) 5px,
+    rgb(255 255 255 / 0.025) 6px
+  );
+}
 
-/* Dyslexia-friendly: Atkinson Hyperlegible is already the UI font; this widens
-   spacing and forces the sans everywhere including the serif headings. */
+/* ── Accessibility modes (toggled by data-attrs on <html> in Phase 4) ── */
 html[data-dyslexia="true"] {
-  --font-serif: var(--font-atkinson), ui-sans-serif, sans-serif;
+  --font-display: var(--font-atkinson), ui-sans-serif, sans-serif;
   letter-spacing: 0.01em;
   word-spacing: 0.06em;
   line-height: 1.75;
 }
 
-/* High contrast */
 html[data-contrast="high"] {
-  --color-paper: oklch(100% 0 0);
-  --color-paper-raised: oklch(98% 0 0);
-  --color-ink: oklch(18% 0.02 58);
-  --color-ink-soft: oklch(30% 0.02 58);
-  --color-line: oklch(72% 0.02 70);
+  --color-paper: #ffffff;
+  --color-paper-raised: #ffffff;
+  --color-ink: #1a171d;
+  --color-ink-soft: #3a3640;
+  --color-line: #b9b3bd;
+  --color-plum: #2c1d3d;
   --grain-opacity: 0;
 }
 
-/* Reduced motion (user setting OR site toggle) */
 html[data-motion="reduced"] *,
 html[data-motion="reduced"] *::before,
 html[data-motion="reduced"] *::after {
@@ -112,14 +136,13 @@ html[data-motion="reduced"] *::after {
   }
 }
 
-/* ── Small shared niceties ── */
+/* ── Shared niceties ── */
 ::selection {
-  background: var(--color-terracotta-soft);
+  background: var(--color-rose-soft);
 }
 
-/* Visible focus for keyboard users on every interactive element */
 :focus-visible {
-  outline: 2px solid var(--color-terracotta);
+  outline: 2px solid var(--color-rose);
   outline-offset: 2px;
   border-radius: 4px;
 }
@@ -141,7 +164,7 @@ button:focus:not(:focus-visible) {
   animation: rise 0.5s var(--ease-out-expo) both;
 }
 
-/* Signature: a highlighter swipe that decodes a phrase (landing hero) */
+/* Highlighter swipe that decodes a phrase */
 @keyframes swipe {
   from {
     transform: scaleX(0);
@@ -159,7 +182,7 @@ button:focus:not(:focus-visible) {
   position: absolute;
   inset: 0.05em -0.15em;
   z-index: -1;
-  background: var(--color-terracotta-soft);
+  background: var(--color-rose-soft);
   transform-origin: left center;
   transform: scaleX(0);
   animation: swipe 0.55s var(--ease-out-expo) both;
