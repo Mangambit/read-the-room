@@ -40,10 +40,14 @@ export function ReplyDrafts({ message, decode, sender }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const inFlight = useRef<Set<ReplyTone>>(new Set());
+  // Bumped whenever the goal changes, to invalidate any in-flight stream so a
+  // stale (old-goal) reply can't stamp ghost text into the reset state.
+  const genId = useRef(0);
 
   async function generate(which: ReplyTone, withGoal: ReplyGoal) {
     if (replies[which] || inFlight.current.has(which)) return;
     inFlight.current.add(which);
+    const myId = ++genId.current;
     setStreamingTone(which);
     setError(null);
     try {
@@ -65,6 +69,10 @@ export function ReplyDrafts({ message, decode, sender }: Props) {
       for (;;) {
         const { done, value } = await reader.read();
         if (done) break;
+        if (genId.current !== myId) {
+          await reader.cancel().catch(() => {});
+          break;
+        }
         acc += decoder.decode(value, { stream: true });
         setReplies((prev) => ({ ...prev, [which]: acc }));
       }
@@ -90,6 +98,7 @@ export function ReplyDrafts({ message, decode, sender }: Props) {
 
   function selectGoal(next: ReplyGoal) {
     if (next === goal) return;
+    genId.current++; // invalidate any in-flight stream from the old goal
     setGoal(next);
     setCopied(false);
     setReplies(EMPTY);

@@ -36,6 +36,16 @@ describe("extractJsonObject", () => {
     expect(extractJsonObject(raw)).toEqual({ text: "a } b { c", n: 1 });
   });
 
+  it("handles escaped quotes inside string values", () => {
+    const raw = '{"text":"she said \\"hi\\"","n":1}';
+    expect(extractJsonObject(raw)).toEqual({ text: 'she said "hi"', n: 1 });
+  });
+
+  it("handles a trailing escaped backslash in a string", () => {
+    const raw = '{"text":"path\\\\","n":2}';
+    expect(extractJsonObject(raw)).toEqual({ text: "path\\", n: 2 });
+  });
+
   it("throws on garbage with no JSON object", () => {
     expect(() => extractJsonObject("no json here")).toThrow();
   });
