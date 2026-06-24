@@ -300,10 +300,19 @@ export function ReadTheRoom() {
 
 function DecodeSkeleton() {
   return (
-    <div className="rounded-card bg-plum p-6 shadow-plum sm:p-8">
-      <div className="skeleton h-3 w-32 rounded opacity-40" />
-      <div className="skeleton mt-4 h-7 w-full rounded opacity-30" />
-      <div className="skeleton mt-2 h-7 w-3/4 rounded opacity-30" />
+    <div className="flex flex-col gap-3">
+      <div className="rounded-card border border-line bg-paper-raised p-5 shadow-soft sm:p-6">
+        <div className="skeleton h-3 w-24 rounded" />
+        <div className="skeleton mt-3 h-4 w-full rounded" />
+        <div className="skeleton mt-2 h-4 w-2/3 rounded" />
+      </div>
+      <div className="reveal-scan rounded-card bg-plum p-6 shadow-plum sm:p-8">
+        <p className="text-[0.7rem] font-bold uppercase tracking-[0.16em] text-on-plum-soft">
+          Reading between the lines…
+        </p>
+        <div className="mt-3 h-5 w-full animate-pulse rounded bg-plum-raised" />
+        <div className="mt-2 h-5 w-3/4 animate-pulse rounded bg-plum-raised" />
+      </div>
     </div>
   );
 }

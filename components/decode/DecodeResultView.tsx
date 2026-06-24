@@ -87,7 +87,7 @@ export function DecodeResultView({ result, message }: Props) {
   return (
     <article className="flex flex-col gap-3">
       {/* Their message, with the tells highlighted */}
-      <div className="animate-rise rounded-card border border-line bg-paper-raised p-5 shadow-soft sm:p-6">
+      <div className="animate-rise rounded-card border border-line bg-paper-raised p-5 shadow-soft sm:p-6" style={{ animationDelay: "0ms" }}>
         <Eyebrow>Their message</Eyebrow>
         <p className="mt-2 text-[1.05rem] leading-relaxed text-ink">
           {highlightTells(message, result.tells)}
@@ -95,7 +95,7 @@ export function DecodeResultView({ result, message }: Props) {
       </div>
 
       {/* The reveal — the hidden meaning, seen through the surface */}
-      <div className="reveal-scan animate-rise rounded-card bg-plum p-6 text-on-plum shadow-plum sm:p-8">
+      <div className="reveal-scan animate-rise rounded-card bg-plum p-6 text-on-plum shadow-plum sm:p-8" style={{ animationDelay: "90ms" }}>
         <Eyebrow tone="plum">What they really mean</Eyebrow>
         <p className="mt-3 font-display text-meaning leading-snug text-on-plum">
           {result.meaning}
@@ -113,7 +113,7 @@ export function DecodeResultView({ result, message }: Props) {
       </div>
 
       {/* Read-outs */}
-      <div className="animate-rise rounded-card border border-line bg-paper-raised p-6 shadow-soft sm:p-8">
+      <div className="animate-rise rounded-card border border-line bg-paper-raised p-6 shadow-soft sm:p-8" style={{ animationDelay: "180ms" }}>
         {hasTells && (
           <div className="mb-6 border-b border-line pb-6">
             <Eyebrow>What gave it away</Eyebrow>
