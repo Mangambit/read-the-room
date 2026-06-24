@@ -44,8 +44,10 @@ export function ReplyDrafts({ message, decode, sender }: Props) {
   // stale (old-goal) reply can't stamp ghost text into the reset state.
   const genId = useRef(0);
 
-  async function generate(which: ReplyTone, withGoal: ReplyGoal) {
-    if (replies[which] || inFlight.current.has(which)) return;
+  async function generate(which: ReplyTone, withGoal: ReplyGoal, force = false) {
+    // `force` bypasses the cache check — needed after a goal change resets
+    // `replies` to EMPTY but the closure here still sees the old (truthy) value.
+    if ((!force && replies[which]) || inFlight.current.has(which)) return;
     inFlight.current.add(which);
     const myId = ++genId.current;
     setStreamingTone(which);
@@ -104,8 +106,8 @@ export function ReplyDrafts({ message, decode, sender }: Props) {
     setReplies(EMPTY);
     inFlight.current.clear();
     setStreamingTone(null);
-    // regenerate the current tone with the new goal
-    generate(tone, next);
+    // regenerate the current tone with the new goal (force past the now-stale cache)
+    generate(tone, next, true);
   }
 
   async function copy() {
@@ -169,7 +171,7 @@ export function ReplyDrafts({ message, decode, sender }: Props) {
                 onClick={() => selectGoal(g.value)}
                 className={`rounded-chip border px-3 py-1 text-sm transition ${
                   active
-                    ? "border-rose bg-rose text-on-rose"
+                    ? "border-rose bg-rose-ink text-on-rose"
                     : "border-line bg-paper text-ink-soft hover:border-rose"
                 }`}
               >

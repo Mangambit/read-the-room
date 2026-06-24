@@ -1,11 +1,12 @@
 import { NextRequest } from "next/server";
 import { z } from "zod";
 import { getProvider } from "@/lib/llm";
+import { createDemoProvider } from "@/lib/llm/demo";
 import { SENDERS } from "@/lib/schema";
+import { rateLimit, clientIp } from "@/lib/ratelimit";
 
 export const runtime = "nodejs";
 
-// Allow the browser extension (and any client) to call this stateless endpoint.
 const CORS: Record<string, string> = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
@@ -22,6 +23,13 @@ const BodySchema = z.object({
 });
 
 export async function POST(req: NextRequest) {
+  if (!rateLimit(clientIp(req))) {
+    return Response.json(
+      { error: "You're going a little fast — give it a few seconds and try again." },
+      { status: 429, headers: CORS },
+    );
+  }
+
   let body: z.infer<typeof BodySchema>;
   try {
     body = BodySchema.parse(await req.json());
@@ -40,14 +48,25 @@ export async function POST(req: NextRequest) {
       { headers: CORS },
     );
   } catch (e) {
-    // Privacy: never log message content — only the error.
+    // Privacy: log only the error, never message content.
     console.error(
       "[decode] provider error:",
       e instanceof Error ? e.message : String(e),
     );
-    return Response.json(
-      { error: "I couldn't read that one. Try again, or tap an example below." },
-      { status: 502, headers: CORS },
-    );
+    // Graceful degrade to demo-safe mode instead of failing (covers a dead /
+    // rate-limited / slow API). The UI shows a "saved example" banner.
+    try {
+      const demo = createDemoProvider();
+      const result = await demo.decode(body);
+      return Response.json(
+        { result, provider: demo.name, demo: true },
+        { headers: CORS },
+      );
+    } catch {
+      return Response.json(
+        { error: "I couldn't read that one. Try again in a moment." },
+        { status: 502, headers: CORS },
+      );
+    }
   }
 }

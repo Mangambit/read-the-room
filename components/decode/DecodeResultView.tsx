@@ -58,9 +58,11 @@ export function DecodeResultView({ result, message }: Props) {
   // Render the message with each tell's exact phrase highlighted, linked to its
   // explanation in the list below (hover/focus one to light up the other).
   function highlightedMessage(): React.ReactNode[] {
+    const lower = message.toLowerCase();
     const ranges = tells
       .map((t, i) => {
-        const start = message.indexOf(t.quote);
+        let start = message.indexOf(t.quote);
+        if (start < 0) start = lower.indexOf(t.quote.toLowerCase()); // case-insensitive fallback
         return start < 0 ? null : { start, end: start + t.quote.length, i };
       })
       .filter((r): r is { start: number; end: number; i: number } => r !== null)
@@ -88,7 +90,7 @@ export function DecodeResultView({ result, message }: Props) {
           onMouseEnter={() => setHovered(r.i)}
           onMouseLeave={() => setHovered(null)}
           className={`cursor-help rounded px-0.5 text-ink underline decoration-rose-ink/40 decoration-dotted underline-offset-2 transition-colors ${
-            on ? "bg-rose text-on-rose decoration-transparent" : "bg-rose-soft"
+            on ? "bg-rose-ink text-on-rose decoration-transparent" : "bg-rose-soft"
           }`}
         >
           {message.slice(r.start, r.end)}

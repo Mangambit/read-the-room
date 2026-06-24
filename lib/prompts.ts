@@ -92,7 +92,8 @@ Rules:
 - Output ONLY the reply text. No quotes, no preamble, no explanation.
 - Sound like a real person their age, not an email template. No "I hope this finds you well", no over-apologizing, no corporate filler.
 - Be specific to the situation. Match the length to it (usually 1-4 sentences).
-- Do not invent facts the reader hasn't given.`;
+- Do not invent facts the reader hasn't given.
+- SAFETY: if the message involves abuse, coercion, threats, or controlling behavior, do NOT draft anything that negotiates with, appeases, justifies to, over-explains to, or argues with the other person — that can escalate risk. Keep it short, calm, and non-escalating, and never coach the reader into doing something that puts them in danger. If someone is in real crisis, don't try to fix it — favor warmth and presence over advice.`;
 }
 
 const GOAL_GUIDE: Record<string, string> = {

@@ -223,7 +223,7 @@ export function ReadTheRoom() {
                     onClick={() => setSender(active ? null : s.value)}
                     className={`rounded-chip border px-3 py-1 text-sm transition ${
                       active
-                        ? "border-rose bg-rose text-on-rose"
+                        ? "border-rose bg-rose-ink text-on-rose"
                         : "border-line bg-paper text-ink-soft hover:border-rose"
                     }`}
                   >
@@ -237,7 +237,7 @@ export function ReadTheRoom() {
           <button
             type="submit"
             disabled={!canSubmit}
-            className="shrink-0 rounded-chip bg-ink px-6 py-3 font-bold text-paper shadow-soft transition hover:-translate-y-0.5 hover:bg-rose hover:shadow-lift active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0"
+            className="shrink-0 rounded-chip bg-ink px-6 py-3 font-bold text-paper shadow-soft transition hover:-translate-y-0.5 hover:bg-rose-ink hover:shadow-lift active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0"
           >
             {status === "loading"
               ? mode === "decode"
@@ -290,13 +290,21 @@ export function ReadTheRoom() {
             <>
               {result.crisisFlag && <SafetyBanner />}
               <DecodeResultView result={result} message={decoded?.message ?? ""} />
-              {decoded && (
+              {decoded && !result.crisisFlag && (
                 <ReplyDrafts
                   key={decoded.message}
                   message={decoded.message}
                   decode={result}
                   sender={decoded.sender}
                 />
+              )}
+              {result.crisisFlag && (
+                <p className="rounded-card border border-line bg-paper-raised px-5 py-4 text-sm leading-relaxed text-ink-soft">
+                  We&rsquo;re not drafting a reply here. When someone&rsquo;s
+                  really hurting, being present matters more than the perfect
+                  words — let them know you&rsquo;re there, and share a resource
+                  if it feels right.
+                </p>
               )}
             </>
           )}

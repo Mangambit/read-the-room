@@ -34,7 +34,9 @@ export async function oaiJson(
       ] satisfies Msg[],
       response_format: { type: "json_object" },
       temperature: 0.4,
+      max_tokens: 800,
     }),
+    signal: AbortSignal.timeout(15000),
   });
 
   if (!res.ok) {
@@ -66,8 +68,10 @@ export async function* oaiStream(
         { role: "user", content: user },
       ] satisfies Msg[],
       temperature: 0.6,
+      max_tokens: 600,
       stream: true,
     }),
+    signal: AbortSignal.timeout(20000),
   });
 
   if (!res.ok || !res.body) {

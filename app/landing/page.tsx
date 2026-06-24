@@ -26,7 +26,7 @@ export default function Landing() {
         </div>
         <Link
           href="/"
-          className="rounded-chip bg-ink px-4 py-2 text-sm font-bold text-paper transition hover:bg-rose"
+          className="rounded-chip bg-ink px-4 py-2 text-sm font-bold text-paper transition hover:bg-rose-ink"
         >
           Open the app
         </Link>
@@ -51,7 +51,7 @@ export default function Landing() {
           <div className="mt-7 flex flex-wrap items-center gap-3">
             <Link
               href="/"
-              className="rounded-chip bg-ink px-6 py-3 font-bold text-paper shadow-soft transition hover:bg-rose"
+              className="rounded-chip bg-ink px-6 py-3 font-bold text-paper shadow-soft transition hover:bg-rose-ink"
             >
               Read a message →
             </Link>
@@ -172,7 +172,7 @@ export default function Landing() {
           </p>
           <Link
             href="/"
-            className="mt-8 inline-block rounded-chip bg-paper px-6 py-3 font-bold text-ink transition hover:bg-rose hover:text-on-rose"
+            className="mt-8 inline-block rounded-chip bg-paper px-6 py-3 font-bold text-ink transition hover:bg-rose-ink hover:text-on-rose"
           >
             Try it now →
           </Link>
