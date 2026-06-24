@@ -141,6 +141,30 @@ button:focus:not(:focus-visible) {
   animation: rise 0.5s var(--ease-out-expo) both;
 }
 
+/* Signature: a highlighter swipe that decodes a phrase (landing hero) */
+@keyframes swipe {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+.mark-decode {
+  position: relative;
+  white-space: nowrap;
+}
+.mark-decode::before {
+  content: "";
+  position: absolute;
+  inset: 0.05em -0.15em;
+  z-index: -1;
+  background: var(--color-terracotta-soft);
+  transform-origin: left center;
+  transform: scaleX(0);
+  animation: swipe 0.55s var(--ease-out-expo) both;
+}
+
 @keyframes shimmer {
   to {
     background-position: 200% 0;
