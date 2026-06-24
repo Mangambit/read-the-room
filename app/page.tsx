@@ -3,7 +3,7 @@ import { AccessibilityMenu } from "@/components/a11y/AccessibilityMenu";
 
 export default function Home() {
   return (
-    <div className="relative z-10 mx-auto flex min-h-dvh w-full max-w-2xl flex-col px-5 py-10 sm:py-16">
+    <div className="relative z-10 mx-auto flex min-h-dvh w-full max-w-2xl flex-col px-5 py-10 pb-28 sm:py-16 sm:pb-28">
       <header className="mb-8">
         <div className="flex items-baseline gap-2">
           <span

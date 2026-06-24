@@ -87,8 +87,8 @@ export function DecodeResultView({ result, message }: Props) {
           aria-describedby={`tell-${r.i}`}
           onMouseEnter={() => setHovered(r.i)}
           onMouseLeave={() => setHovered(null)}
-          className={`rounded px-0.5 text-ink transition-colors ${
-            on ? "bg-rose text-on-rose" : "bg-rose-soft"
+          className={`cursor-help rounded px-0.5 text-ink underline decoration-rose-ink/40 decoration-dotted underline-offset-2 transition-colors ${
+            on ? "bg-rose text-on-rose decoration-transparent" : "bg-rose-soft"
           }`}
         >
           {message.slice(r.start, r.end)}
@@ -111,6 +111,11 @@ export function DecodeResultView({ result, message }: Props) {
         <p className="mt-2 text-[1.05rem] leading-relaxed text-ink">
           {highlightedMessage()}
         </p>
+        {hasTells && (
+          <p className="mt-2 text-xs text-ink-faint">
+            Hover a highlight to see what gave it away ↓
+          </p>
+        )}
       </div>
 
       {/* The reveal — the hidden meaning, seen through the surface */}

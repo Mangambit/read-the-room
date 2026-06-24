@@ -41,7 +41,7 @@ export function DecodeReveal() {
         <p className="text-[0.7rem] font-bold uppercase tracking-[0.16em] text-on-plum-soft">
           What they really mean
         </p>
-        <p className="mt-1.5 font-display text-xl leading-snug text-on-plum">
+        <p className="decode-in mt-1.5 font-display text-xl leading-snug text-on-plum">
           They&rsquo;re annoyed you&rsquo;re late and want it in now. The{" "}
           <span className="text-rose-light">&ldquo;extra support&rdquo;</span> is
           a polite jab, not a real offer.
