@@ -91,15 +91,26 @@ Rules:
 - Do not invent facts the reader hasn't given.`;
 }
 
+const GOAL_GUIDE: Record<string, string> = {
+  apologize: "smooth it over and take responsibility, without groveling",
+  boundary: "kindly hold a boundary or say no, without over-explaining",
+  deescalate: "calm things down and lower the temperature",
+  clarify: "warmly ask what they actually mean or want",
+};
+
 export function replyUser(input: ReplyInput): string {
   const d: DecodeResult = input.decode;
+  const goalLine =
+    input.goal && input.goal !== "auto" && GOAL_GUIDE[input.goal]
+      ? `\nThe reader's goal for this reply: ${GOAL_GUIDE[input.goal]}.`
+      : "";
   return `The message the reader received:${senderLine(input.sender)}
 """
 ${input.message}
 """
 
 What it really means: ${d.meaning}
-What they want: ${d.wants}
+What they want: ${d.wants}${goalLine}
 
 Write the reply now.`;
 }

@@ -74,6 +74,16 @@ export type DecodeResult = z.infer<typeof DecodeResultSchema>;
 export const REPLY_TONES = ["warm", "professional", "firm"] as const;
 export type ReplyTone = (typeof REPLY_TONES)[number];
 
+/** What the reader is trying to achieve with their reply. */
+export const REPLY_GOALS = [
+  "auto",
+  "apologize",
+  "boundary",
+  "deescalate",
+  "clarify",
+] as const;
+export type ReplyGoal = (typeof REPLY_GOALS)[number];
+
 /** Result of the pre-send check: how the reader's own draft will land. */
 export const PreSendResultSchema = z.object({
   /** How the recipient is likely to read this draft. */
@@ -94,6 +104,7 @@ export interface ReplyInput {
   message: string;
   decode: DecodeResult;
   tone: ReplyTone;
+  goal?: ReplyGoal;
   sender?: Sender;
 }
 

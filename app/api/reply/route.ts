@@ -1,7 +1,12 @@
 import { NextRequest } from "next/server";
 import { z } from "zod";
 import { getProvider } from "@/lib/llm";
-import { DecodeResultSchema, REPLY_TONES, SENDERS } from "@/lib/schema";
+import {
+  DecodeResultSchema,
+  REPLY_TONES,
+  REPLY_GOALS,
+  SENDERS,
+} from "@/lib/schema";
 
 export const runtime = "nodejs";
 
@@ -9,6 +14,7 @@ const BodySchema = z.object({
   message: z.string().min(1).max(4000),
   decode: DecodeResultSchema,
   tone: z.enum(REPLY_TONES),
+  goal: z.enum(REPLY_GOALS).optional(),
   sender: z.enum(SENDERS).optional(),
 });
 

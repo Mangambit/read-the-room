@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import {
   REPLY_TONES,
   type DecodeResult,
+  type ReplyGoal,
   type ReplyTone,
   type Sender,
 } from "@/lib/schema";
@@ -20,19 +21,27 @@ const TONE_LABEL: Record<ReplyTone, string> = {
   firm: "Firm",
 };
 
-type ReplyState = Record<ReplyTone, string>;
+const GOALS: { value: ReplyGoal; label: string }[] = [
+  { value: "auto", label: "Whatever fits" },
+  { value: "apologize", label: "Smooth it over" },
+  { value: "boundary", label: "Set a boundary" },
+  { value: "deescalate", label: "Calm it down" },
+  { value: "clarify", label: "Ask what they mean" },
+];
 
+type ReplyState = Record<ReplyTone, string>;
 const EMPTY: ReplyState = { warm: "", professional: "", firm: "" };
 
 export function ReplyDrafts({ message, decode, sender }: Props) {
   const [tone, setTone] = useState<ReplyTone>("warm");
+  const [goal, setGoal] = useState<ReplyGoal>("auto");
   const [replies, setReplies] = useState<ReplyState>(EMPTY);
   const [streamingTone, setStreamingTone] = useState<ReplyTone | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const inFlight = useRef<Set<ReplyTone>>(new Set());
 
-  async function generate(which: ReplyTone) {
+  async function generate(which: ReplyTone, withGoal: ReplyGoal) {
     if (replies[which] || inFlight.current.has(which)) return;
     inFlight.current.add(which);
     setStreamingTone(which);
@@ -41,11 +50,15 @@ export function ReplyDrafts({ message, decode, sender }: Props) {
       const res = await fetch("/api/reply", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message, decode, tone: which, sender }),
+        body: JSON.stringify({
+          message,
+          decode,
+          tone: which,
+          goal: withGoal,
+          sender,
+        }),
       });
-      if (!res.ok || !res.body) {
-        throw new Error("reply failed");
-      }
+      if (!res.ok || !res.body) throw new Error("reply failed");
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       let acc = "";
@@ -63,16 +76,27 @@ export function ReplyDrafts({ message, decode, sender }: Props) {
     }
   }
 
-  // Auto-generate the warm reply once, when this draft block first appears.
+  // Auto-generate the warm reply once on mount.
   useEffect(() => {
-    generate("warm");
+    generate("warm", "auto");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function selectTone(next: ReplyTone) {
     setTone(next);
     setCopied(false);
-    generate(next);
+    generate(next, goal);
+  }
+
+  function selectGoal(next: ReplyGoal) {
+    if (next === goal) return;
+    setGoal(next);
+    setCopied(false);
+    setReplies(EMPTY);
+    inFlight.current.clear();
+    setStreamingTone(null);
+    // regenerate the current tone with the new goal
+    generate(tone, next);
   }
 
   async function copy() {
@@ -111,12 +135,37 @@ export function ReplyDrafts({ message, decode, sender }: Props) {
                 type="button"
                 onClick={() => selectTone(t)}
                 className={`rounded-chip px-3 py-1 text-sm transition ${
-                  active
-                    ? "bg-ink text-paper"
-                    : "text-ink-soft hover:text-ink"
+                  active ? "bg-ink text-paper" : "text-ink-soft hover:text-ink"
                 }`}
               >
                 {TONE_LABEL[t]}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Goal selector */}
+      <div className="mt-4">
+        <p className="text-[0.7rem] font-bold uppercase tracking-[0.16em] text-ink-faint">
+          What do you want to do?
+        </p>
+        <div className="mt-2 flex flex-wrap gap-2">
+          {GOALS.map((g) => {
+            const active = goal === g.value;
+            return (
+              <button
+                key={g.value}
+                type="button"
+                aria-pressed={active}
+                onClick={() => selectGoal(g.value)}
+                className={`rounded-chip border px-3 py-1 text-sm transition ${
+                  active
+                    ? "border-rose bg-rose text-on-rose"
+                    : "border-line bg-paper text-ink-soft hover:border-rose"
+                }`}
+              >
+                {g.label}
               </button>
             );
           })}

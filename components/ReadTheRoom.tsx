@@ -29,12 +29,16 @@ interface PreSendOk {
   demo: boolean;
 }
 
-const COPY: Record<Mode, { label: string; placeholder: string; sender: string; cta: string }> = {
+const COPY: Record<
+  Mode,
+  { label: string; placeholder: string; sender: string; cta: string; hint?: string }
+> = {
   decode: {
     label: "Paste the message that’s stressing you out",
     placeholder: "e.g. “Per my last email, the assignment was due Friday…”",
     sender: "Who’s it from?",
     cta: "Read the room",
+    hint: "One message or a whole back-and-forth — paste it all.",
   },
   presend: {
     label: "Paste the reply you’re about to send",
@@ -186,6 +190,9 @@ export function ReadTheRoom() {
           placeholder={copy.placeholder}
           className="mt-2 w-full resize-y rounded-2xl border border-line bg-paper px-4 py-3 text-ink outline-none transition placeholder:text-ink-faint focus:border-rose focus:ring-4 focus:ring-rose-soft"
         />
+        {copy.hint && (
+          <p className="mt-2 text-xs text-ink-faint">{copy.hint}</p>
+        )}
 
         <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <fieldset>
