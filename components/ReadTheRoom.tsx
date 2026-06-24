@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { DecodeResult, Sender } from "@/lib/schema";
 import { SAMPLES } from "@/lib/demo-data";
 import { DecodeResultView } from "@/components/decode/DecodeResultView";
+import { ReplyDrafts } from "@/components/decode/ReplyDrafts";
 
 type Status = "idle" | "loading" | "done" | "error";
 
@@ -27,6 +28,7 @@ export function ReadTheRoom() {
   const [sender, setSender] = useState<Sender | null>(null);
   const [status, setStatus] = useState<Status>("idle");
   const [result, setResult] = useState<DecodeResult | null>(null);
+  const [decoded, setDecoded] = useState<{ message: string; sender?: Sender } | null>(null);
   const [isDemo, setIsDemo] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -47,6 +49,7 @@ export function ReadTheRoom() {
         return;
       }
       setResult(data.result);
+      setDecoded({ message: msg, sender: snd ?? undefined });
       setIsDemo(data.demo);
       setStatus("done");
     } catch {
@@ -166,6 +169,14 @@ export function ReadTheRoom() {
             </p>
           )}
           <DecodeResultView result={result} />
+          {decoded && (
+            <ReplyDrafts
+              key={decoded.message}
+              message={decoded.message}
+              decode={result}
+              sender={decoded.sender}
+            />
+          )}
         </div>
       )}
     </div>
