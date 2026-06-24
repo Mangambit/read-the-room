@@ -10,6 +10,8 @@ in your voice. Built for neurodivergent people and anyone who overthinks the rep
 
 > Youth Code x AI · Track 03 (*AI That Actually Helps People*)
 
+**▶ Live demo: https://read-the-room-phi.vercel.app** &nbsp;·&nbsp; [Source on GitHub](https://github.com/Mangambit/read-the-room)
+
 ---
 
 ## Why it exists

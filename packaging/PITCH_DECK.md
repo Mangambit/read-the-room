@@ -50,7 +50,7 @@ internet forgets.
 
 **10 · What's next + try it**
 Browser extension (decode any text, anywhere) · more languages · saved tones.
-> Try it: [your link] · Built by Dariush.
+> Try it: https://read-the-room-phi.vercel.app · Built by Dariush.
 
 ---
 

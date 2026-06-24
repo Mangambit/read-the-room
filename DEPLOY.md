@@ -1,5 +1,10 @@
 # Deploying Read the Room
 
+> ✅ **Deployed (production, demo-safe mode): https://read-the-room-phi.vercel.app**
+> Public, no login wall, verified live. Runs `LLM_PROVIDER=demo` so the link can't be
+> rate-limited or expose a key. To redeploy after changes: `npx vercel --prod --yes
+> --scope dariushafshar209-2622s-projects`.
+
 Two ways to have it ready for judges. You can do both.
 
 ## Recommended split

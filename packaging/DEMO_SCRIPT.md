@@ -64,7 +64,7 @@ the reveal. Hold.
 > "Read the Room. For everyone who's ever overthought the reply. It's the friend who
 > finally explains what they actually meant."
 
-**End card:** `Read the Room` · *what they really mean* · [your link]
+**End card:** `Read the Room` · *what they really mean* · https://read-the-room-phi.vercel.app
 
 ---
 
