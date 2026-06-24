@@ -136,12 +136,12 @@ export default function Landing() {
                 "The whole interface is set in Atkinson Hyperlegible, drawn specifically so letters are hard to confuse.",
               ],
               [
-                "Plain language, on demand",
-                "One toggle rewrites every read in shorter, simpler words.",
+                "Dyslexia-friendly mode",
+                "One tap widens spacing and switches to a plain, easy-to-track font.",
               ],
               [
                 "Calm by default",
-                "Reduced-motion and high-contrast modes, soft surfaces, no flashing, no noise.",
+                "Reduced-motion and high-contrast toggles, soft surfaces, no flashing, no noise.",
               ],
               [
                 "It never judges",

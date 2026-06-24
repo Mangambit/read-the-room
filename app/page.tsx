@@ -1,4 +1,5 @@
 import { ReadTheRoom } from "@/components/ReadTheRoom";
+import { AccessibilityMenu } from "@/components/a11y/AccessibilityMenu";
 
 export default function Home() {
   return (
@@ -34,6 +35,8 @@ export default function Home() {
           discarded.
         </p>
       </footer>
+
+      <AccessibilityMenu />
     </div>
   );
 }
