@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import {
   REPLY_TONES,
+  type Age,
   type DecodeResult,
   type ReplyGoal,
   type ReplyTone,
@@ -13,6 +14,7 @@ type Props = {
   message: string;
   decode: DecodeResult;
   sender?: Sender;
+  age?: Age;
 };
 
 const TONE_LABEL: Record<ReplyTone, string> = {
@@ -32,7 +34,7 @@ const GOALS: { value: ReplyGoal; label: string }[] = [
 type ReplyState = Record<ReplyTone, string>;
 const EMPTY: ReplyState = { warm: "", professional: "", firm: "" };
 
-export function ReplyDrafts({ message, decode, sender }: Props) {
+export function ReplyDrafts({ message, decode, sender, age }: Props) {
   const [tone, setTone] = useState<ReplyTone>("warm");
   const [goal, setGoal] = useState<ReplyGoal>("auto");
   const [replies, setReplies] = useState<ReplyState>(EMPTY);
@@ -62,6 +64,7 @@ export function ReplyDrafts({ message, decode, sender }: Props) {
           tone: which,
           goal: withGoal,
           sender,
+          age,
         }),
       });
       if (!res.ok || !res.body) throw new Error("reply failed");

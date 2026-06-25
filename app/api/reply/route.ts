@@ -7,6 +7,7 @@ import {
   REPLY_TONES,
   REPLY_GOALS,
   SENDERS,
+  AGES,
 } from "@/lib/schema";
 import { rateLimit, clientIp } from "@/lib/ratelimit";
 
@@ -18,6 +19,7 @@ const BodySchema = z.object({
   tone: z.enum(REPLY_TONES),
   goal: z.enum(REPLY_GOALS).optional(),
   sender: z.enum(SENDERS).optional(),
+  age: z.enum(AGES).optional(),
 });
 
 export async function POST(req: NextRequest) {

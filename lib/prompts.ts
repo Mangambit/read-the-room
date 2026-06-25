@@ -3,7 +3,35 @@ import type {
   ReplyInput,
   PreSendInput,
   DecodeResult,
+  Age,
 } from "./schema";
+import { AGE_LABEL } from "./schema";
+
+/**
+ * How each age band actually texts (2025-2026). Baseline — refined from real
+ * Reddit/social research. Used both to READ a message with the right norms and
+ * to WRITE a reply in the reader's authentic voice.
+ */
+const AGE_GUIDE: Record<Age, string> = {
+  middle:
+    "Mostly lowercase, almost no punctuation. A period at the end, or full capitalization, reads as serious or mad. 'k' / 'ok.' is cold or dismissive. Heavy current slang (fr, ngl, lowkey, bruh, it's giving). 💀 and 😭 mean 'laughing,' not death/crying. Short, fast, meme-y.",
+  high:
+    "Lowercase by default; a period reads passive-aggressive. 'lol/lmao' often soften rather than mean real laughter. Slang like 'no cap,' 'fr fr,' 'mid,' 'ate,' 'delulu.' 💀😭 = laughing. Casual but a bit more self-aware than middle school.",
+  college:
+    "Gen Z casual but can switch to full, coherent sentences when it matters. Irony-heavy; 'honestly,' 'literally,' 'i'm crying' (= laughing). Lowercase with friends, tactical emoji. Reads dryness/curtness as a real signal.",
+  adult:
+    "Normal capitalization and punctuation — a period is NOT cold here. 'lol/haha,' sincere emoji (🙂😂👍), mostly complete sentences, polite. Passive-aggression shows through formality ('per my last email,' 'no worries,' a clipped 'K.'). Don't use teen slang.",
+};
+
+function ageReadLine(age?: Age): string {
+  if (!age) return "";
+  return `\nThe reader is ${AGE_LABEL[age]}-age and usually hears from people around their age — read the slang, punctuation, and tone with these norms: ${AGE_GUIDE[age]}`;
+}
+
+function ageWriteLine(age?: Age): string {
+  if (!age) return "";
+  return `\nWrite in the natural texting voice of a ${AGE_LABEL[age]}-age person: ${AGE_GUIDE[age]} Match it, but never force slang or sound like an adult imitating a teen.`;
+}
 
 /**
  * Prompt templates. Kept in one place so they can be iterated against the
@@ -69,7 +97,7 @@ ${DECODE_EXAMPLES}
 ${DECODE_SHAPE}`;
 
 export function decodeUser(input: DecodeInput): string {
-  return `Message the reader received:${senderLine(input.sender)}
+  return `Message the reader received:${senderLine(input.sender)}${ageReadLine(input.age)}
 """
 ${input.message}
 """
@@ -115,7 +143,7 @@ ${input.message}
 """
 
 What it really means: ${d.meaning}
-What they want: ${d.wants}${goalLine}
+What they want: ${d.wants}${goalLine}${ageWriteLine(input.age)}
 
 Write the reply now.`;
 }
@@ -138,7 +166,7 @@ export function presendUser(input: PreSendInput): string {
   const orig = input.original
     ? `\nThey are replying to this message:\n"""\n${input.original}\n"""\n`
     : "";
-  return `${orig}${senderLine(input.sender)}
+  return `${orig}${senderLine(input.sender)}${ageReadLine(input.age)}${ageWriteLine(input.age)}
 The reader's draft they are about to send:
 """
 ${input.draft}

@@ -16,6 +16,17 @@ export const SENDERS = [
 ] as const;
 export type Sender = (typeof SENDERS)[number];
 
+/** The reader's age band — shapes how we read slang/tone AND how we write the reply. */
+export const AGES = ["middle", "high", "college", "adult"] as const;
+export type Age = (typeof AGES)[number];
+
+export const AGE_LABEL: Record<Age, string> = {
+  middle: "Middle school",
+  high: "High school",
+  college: "College",
+  adult: "Adult",
+};
+
 export const TONES_HINT = [
   "frustrated",
   "rushed",
@@ -98,6 +109,7 @@ export type PreSendResult = z.infer<typeof PreSendResultSchema>;
 export interface DecodeInput {
   message: string;
   sender?: Sender;
+  age?: Age;
 }
 
 export interface ReplyInput {
@@ -106,6 +118,7 @@ export interface ReplyInput {
   tone: ReplyTone;
   goal?: ReplyGoal;
   sender?: Sender;
+  age?: Age;
 }
 
 export interface PreSendInput {
@@ -114,4 +127,5 @@ export interface PreSendInput {
   /** Optional original message they are replying to, for context. */
   original?: string;
   sender?: Sender;
+  age?: Age;
 }

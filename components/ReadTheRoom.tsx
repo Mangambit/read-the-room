@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import type { DecodeResult, PreSendResult, Sender } from "@/lib/schema";
+import { useEffect, useState } from "react";
+import type { Age, DecodeResult, PreSendResult, Sender } from "@/lib/schema";
+import { AGES, AGE_LABEL } from "@/lib/schema";
 import { SAMPLES } from "@/lib/demo-data";
 import { DecodeResultView } from "@/components/decode/DecodeResultView";
 import { ReplyDrafts } from "@/components/decode/ReplyDrafts";
@@ -55,10 +56,38 @@ export function ReadTheRoom() {
   const [status, setStatus] = useState<Status>("idle");
 
   const [result, setResult] = useState<DecodeResult | null>(null);
-  const [decoded, setDecoded] = useState<{ message: string; sender?: Sender } | null>(null);
+  const [decoded, setDecoded] = useState<{
+    message: string;
+    sender?: Sender;
+    age?: Age;
+  } | null>(null);
   const [presend, setPresend] = useState<PreSendResult | null>(null);
   const [isDemo, setIsDemo] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [age, setAge] = useState<Age | null>(null);
+
+  // Age is a persistent preference — it shapes both the read and the reply voice.
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("rtr-age");
+      if (saved && (AGES as readonly string[]).includes(saved)) {
+        setAge(saved as Age);
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  function selectAge(next: Age) {
+    const value = age === next ? null : next;
+    setAge(value);
+    try {
+      if (value) localStorage.setItem("rtr-age", value);
+      else localStorage.removeItem("rtr-age");
+    } catch {
+      // ignore
+    }
+  }
 
   function reset() {
     setStatus("idle");
@@ -85,7 +114,11 @@ export function ReadTheRoom() {
       const res = await fetch("/api/decode", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: msg, sender: snd ?? undefined }),
+        body: JSON.stringify({
+          message: msg,
+          sender: snd ?? undefined,
+          age: age ?? undefined,
+        }),
       });
       const data = (await res.json()) as DecodeOk | { error: string };
       if (!res.ok || "error" in data) {
@@ -94,7 +127,7 @@ export function ReadTheRoom() {
         return;
       }
       setResult(data.result);
-      setDecoded({ message: msg, sender: snd ?? undefined });
+      setDecoded({ message: msg, sender: snd ?? undefined, age: age ?? undefined });
       setIsDemo(data.demo);
       setStatus("done");
     } catch {
@@ -112,7 +145,11 @@ export function ReadTheRoom() {
       const res = await fetch("/api/presend", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ draft, sender: snd ?? undefined }),
+        body: JSON.stringify({
+          draft,
+          sender: snd ?? undefined,
+          age: age ?? undefined,
+        }),
       });
       const data = (await res.json()) as PreSendOk | { error: string };
       if (!res.ok || "error" in data) {
@@ -180,6 +217,36 @@ export function ReadTheRoom() {
               : "The reply check is ready below."
             : ""}
       </p>
+
+      {/* Age — tailors the read's slang + the reply voice */}
+      <fieldset>
+        <legend className="text-[0.7rem] font-bold uppercase tracking-[0.16em] text-ink-faint">
+          I&rsquo;m in{" "}
+          <span className="font-normal normal-case tracking-normal text-ink-faint">
+            (tunes the slang + your reply voice — optional)
+          </span>
+        </legend>
+        <div className="mt-2 flex flex-wrap gap-2">
+          {AGES.map((a) => {
+            const active = age === a;
+            return (
+              <button
+                key={a}
+                type="button"
+                aria-pressed={active}
+                onClick={() => selectAge(a)}
+                className={`rounded-chip border px-3 py-1 text-sm transition ${
+                  active
+                    ? "border-rose-ink bg-rose-ink text-on-rose"
+                    : "border-line bg-paper-raised text-ink-soft hover:border-rose"
+                }`}
+              >
+                {AGE_LABEL[a]}
+              </button>
+            );
+          })}
+        </div>
+      </fieldset>
 
       <form
         onSubmit={handleSubmit}
@@ -296,6 +363,7 @@ export function ReadTheRoom() {
                   message={decoded.message}
                   decode={result}
                   sender={decoded.sender}
+                  age={decoded.age}
                 />
               )}
               {result.crisisFlag && (

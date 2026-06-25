@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { z } from "zod";
 import { getProvider } from "@/lib/llm";
 import { createDemoProvider } from "@/lib/llm/demo";
-import { SENDERS } from "@/lib/schema";
+import { SENDERS, AGES } from "@/lib/schema";
 import { rateLimit, clientIp } from "@/lib/ratelimit";
 
 export const runtime = "nodejs";
@@ -20,6 +20,7 @@ export function OPTIONS() {
 const BodySchema = z.object({
   message: z.string().min(1).max(4000),
   sender: z.enum(SENDERS).optional(),
+  age: z.enum(AGES).optional(),
 });
 
 export async function POST(req: NextRequest) {
