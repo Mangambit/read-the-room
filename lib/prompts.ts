@@ -20,7 +20,7 @@ const AGE_GUIDE: Record<Age, string> = {
   college:
     "Lowercase as a softener; caps only for emphasis ('i am NOT') or sincerity. Period=cold/serious; 'fine'/'fineee'/'fine.' are three different moods. 'k'=maximally cold, 'kk'=warm; 'lol' defuses and its ABSENCE signals anger. 💀/😭=laughing (😂=old), 👍=passive-aggressive, 🙂=fake smile, 🫡=resigned. Slang carries an ironic/meta layer (it's giving, delulu, bestie/bruh, lowkey, valid/based/cooked, 'respectfully', 'not me ___') — never 4+ stacked. Hard rule: register-switch by recipient — loose to a friend, fully formal with zero slang/emoji to a professor. 'Upset but won't say it' = 'it's fine'/'no worries'/sudden formality + brevity.",
   adult:
-    "Warmth shows through EFFORT: proper capitalization, punctuation, and exclamation points ('Sounds good!','No worries!') — a trailing period is NEUTRAL here, not cold. Full words over abbreviations; sincere end-emoji (🙂😊👍, 😂 for laughing). Do NOT use teen slang — stacking current slang reads as 'a millennial doing a bit'. Register: loose with friends (lol/haha/omg), polite at work ('Just following up','Will do!'), warmest with family. Curtness/passive-aggression = DROPPING the exclamation/emoji and going short ('Ok.','Noted.','Per my last email.'); 'upset but won't say it' = politeness escalates while warmth drops ('Okay. That's fine. Thanks.').",
+    "Warmth shows through EFFORT: proper capitalization, punctuation, and a SINGLE exclamation point where it fits ('Sounds good!','No worries!') — never stack '!!'; a trailing period is NEUTRAL here, not cold. Full words over abbreviations; sincere end-emoji (🙂😊👍, 😂 for laughing). Do NOT use teen slang — stacking current slang reads as 'a millennial doing a bit'. Register: loose with friends (lol/haha/omg), polite at work ('Just following up','Will do!'), warmest with family. Curtness/passive-aggression = DROPPING the exclamation/emoji and going short ('Ok.','Noted.','Per my last email.'); 'upset but won't say it' = politeness escalates while warmth drops ('Okay. That's fine. Thanks.').",
 };
 
 function ageReadLine(age?: Age): string {
@@ -120,6 +120,7 @@ Now ghost-write a reply the READER can send back, in their own first-person voic
 Rules:
 - Output ONLY the reply text. No quotes, no preamble, no explanation.
 - Sound like a real person their age, not an email template. No "I hope this finds you well", no over-apologizing, no corporate filler.
+- Don't overshoot into gushing or try-hard enthusiasm: NO stacked exclamation points (one "!" max, often none), and use emoji RARELY — only when it genuinely fits. Most real texts have none. Match the energy of a normal message, not an ad.
 - Be specific to the situation. Match the length to it (usually 1-4 sentences).
 - Do not invent facts the reader hasn't given.
 - SAFETY: if the message involves abuse, coercion, threats, or controlling behavior, do NOT draft anything that negotiates with, appeases, justifies to, over-explains to, or argues with the other person — that can escalate risk. Keep it short, calm, and non-escalating, and never coach the reader into doing something that puts them in danger. If someone is in real crisis, don't try to fix it — favor warmth and presence over advice.`;
@@ -159,9 +160,13 @@ Respond with ONLY a single JSON object — no markdown, no fences, no commentary
 {
   "landing": string,    // how the recipient will most likely read this draft, given its tone. Specific, plain.
   "risks": string[],    // 0-4 concrete ways it could be misread or land badly (skip if genuinely none)
-  "softer": string      // a warmer, clearer rewrite that keeps the reader's actual point, ready to send
+  "softer": string      // a SMALL, proportionate rewrite — same length and energy as the draft, just with the sting removed
 }
-The "softer" rewrite must preserve the reader's real meaning — never flip their point.`;
+Rules for "softer":
+- Keep it PROPORTIONATE. A two-word draft gets a two-to-five-word fix, not a gushing makeover. Reuse the reader's own words where you can.
+- NO emoji. NO stacked exclamation points ("!!" / "!!!") — at most one "!", and a plain period is often warmer and more genuine.
+- The goal is "not cold," NOT "enthusiastic." Examples: "alr thanks" -> "thanks, appreciate it" (NOT "thanks so much!!"); "k" -> "sounds good" (NOT "Sounds amazing!!!"); "fine do whatever" -> "yeah that works for me".
+- Never flip the reader's real meaning, and never make them sound like a brand or a parent.`;
 
 export function presendUser(input: PreSendInput): string {
   const orig = input.original

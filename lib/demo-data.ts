@@ -84,7 +84,7 @@ export const SAMPLES: DemoSample[] = [
       crisisFlag: false,
     },
     replies: {
-      warm: "Sure thing! I'm free right now — want to call me, or should I send a link? 😊",
+      warm: "Sure, I'm free right now — want to call, or should I send a link?",
       professional:
         "Of course — I'm available now. Shall I call you, or would you like to send a meeting link?",
       firm: "Sure. I'm free for the next 30 minutes — send a link whenever works and I'll jump on.",
@@ -116,7 +116,7 @@ export const SAMPLES: DemoSample[] = [
       crisisFlag: false,
     },
     replies: {
-      warm: "all good! 😄 lmk if you wanna hang sometime this week",
+      warm: "all good — lmk if you wanna hang sometime this week",
       professional: "No worries — talk soon!",
       firm: "Cool. Let me know if you want to make a plan — otherwise no rush.",
     },
@@ -187,7 +187,7 @@ export const SAMPLES: DemoSample[] = [
       crisisFlag: false,
     },
     replies: {
-      warm: "no worries at all!! stuff happens 💛 let's reschedule — are you free this weekend?",
+      warm: "no worries, stuff happens. let's reschedule — free this weekend?",
       professional:
         "Totally understand — no problem at all. Let's find another time; does this weekend work?",
       firm: "All good. Let's lock in another day though — how's Saturday?",
@@ -253,7 +253,7 @@ export const GENERIC_DEMO_DECODE: DecodeResult = {
 };
 
 export const GENERIC_DEMO_REPLIES: Record<ReplyTone, string> = {
-  warm: "Thanks for letting me know! Totally on the same page — let me know if there's anything you need from me. 😊",
+  warm: "Thanks for letting me know — I'm on the same page. Let me know if there's anything you need from me.",
   professional:
     "Thank you for the message. I understand — please let me know if there's anything you'd like me to do next.",
   firm: "Got it, thanks. Let me know the next step and I'll take care of my part.",
