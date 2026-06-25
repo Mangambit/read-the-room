@@ -18,6 +18,8 @@ export function createCerebrasProvider(
     baseUrl: "https://api.cerebras.ai/v1",
     apiKey: key,
     model: model ?? process.env.CEREBRAS_MODEL ?? "llama-3.3-70b",
+    visionModel:
+      process.env.CEREBRAS_VISION_MODEL ?? "llama-4-scout-17b-16e-instruct",
   };
   return createOAIProvider(`cerebras:${cfg.model}`, cfg);
 }

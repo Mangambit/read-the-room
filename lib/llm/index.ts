@@ -39,8 +39,19 @@ export function getProvider(): LlmProvider {
   if (explicit === "anthropic" && process.env.ANTHROPIC_API_KEY) {
     safePush(() => createAnthropicProvider());
   }
-  for (const k of groqKeys()) safePush(() => createGroqProvider(k));
-  if (process.env.CEREBRAS_API_KEY) safePush(() => createCerebrasProvider());
+  // Default order: Cerebras first (faster, more headroom), Groq as fallback.
+  // Set LLM_PROVIDER=groq to put Groq first.
+  const pushGroq = () => groqKeys().forEach((k) => safePush(() => createGroqProvider(k)));
+  const pushCerebras = () => {
+    if (process.env.CEREBRAS_API_KEY) safePush(() => createCerebrasProvider());
+  };
+  if (explicit === "groq") {
+    pushGroq();
+    pushCerebras();
+  } else {
+    pushCerebras();
+    pushGroq();
+  }
   if (explicit !== "anthropic" && process.env.ANTHROPIC_API_KEY) {
     safePush(() => createAnthropicProvider());
   }
