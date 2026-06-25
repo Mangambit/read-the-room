@@ -1,43 +1,50 @@
 import type { LlmProvider } from "./types";
 import { createGroqProvider } from "./groq";
+import { createCerebrasProvider } from "./cerebras";
 import { createAnthropicProvider } from "./anthropic";
 import { createDemoProvider } from "./demo";
+import { createChainProvider } from "./chain";
 
 export type { LlmProvider } from "./types";
 
-export type ProviderName = "groq" | "anthropic" | "demo";
-
-/**
- * Single place app code resolves the active provider. Selected by env var:
- *   LLM_PROVIDER=groq      -> free, fast live demo (default when GROQ_API_KEY set)
- *   LLM_PROVIDER=anthropic -> best quality, for the recorded video
- *   LLM_PROVIDER=demo      -> offline canned (demo-safe mode)
- *
- * Default: groq if a key exists, otherwise demo (so the app always runs).
- */
-export function resolveProviderName(): ProviderName {
-  const explicit = process.env.LLM_PROVIDER?.toLowerCase();
-  if (explicit === "groq" || explicit === "anthropic" || explicit === "demo") {
-    return explicit;
-  }
-  if (process.env.GROQ_API_KEY) return "groq";
-  if (process.env.ANTHROPIC_API_KEY) return "anthropic";
-  return "demo";
+function groqKeys(): string[] {
+  return (process.env.GROQ_API_KEY ?? "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
 }
 
-let cached: { name: ProviderName; provider: LlmProvider } | null = null;
-
+/**
+ * Resolves the active provider from env, building a fallback CHAIN so a capped
+ * or down key transparently rolls to the next:
+ *   LLM_PROVIDER=demo            -> offline canned (demo-safe mode)
+ *   GROQ_API_KEY=key1,key2,...   -> each key tried in turn (more daily headroom)
+ *   CEREBRAS_API_KEY=...         -> Cerebras fallback after Groq
+ *   ANTHROPIC_API_KEY=...        -> Claude (first if LLM_PROVIDER=anthropic, else last)
+ * The route-level catch is the final safety net to demo-safe mode.
+ */
 export function getProvider(): LlmProvider {
-  const name = resolveProviderName();
-  if (cached && cached.name === name) return cached.provider;
+  const explicit = process.env.LLM_PROVIDER?.toLowerCase();
+  if (explicit === "demo") return createDemoProvider();
 
-  const provider =
-    name === "groq"
-      ? createGroqProvider()
-      : name === "anthropic"
-        ? createAnthropicProvider()
-        : createDemoProvider();
+  const providers: LlmProvider[] = [];
+  const safePush = (make: () => LlmProvider) => {
+    try {
+      providers.push(make());
+    } catch {
+      // key missing/invalid — skip this provider
+    }
+  };
 
-  cached = { name, provider };
-  return provider;
+  if (explicit === "anthropic" && process.env.ANTHROPIC_API_KEY) {
+    safePush(() => createAnthropicProvider());
+  }
+  for (const k of groqKeys()) safePush(() => createGroqProvider(k));
+  if (process.env.CEREBRAS_API_KEY) safePush(() => createCerebrasProvider());
+  if (explicit !== "anthropic" && process.env.ANTHROPIC_API_KEY) {
+    safePush(() => createAnthropicProvider());
+  }
+
+  if (providers.length === 0) return createDemoProvider();
+  return createChainProvider(providers);
 }
