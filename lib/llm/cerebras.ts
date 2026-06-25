@@ -17,9 +17,12 @@ export function createCerebrasProvider(
   const cfg: OAIConfig = {
     baseUrl: "https://api.cerebras.ai/v1",
     apiKey: key,
-    model: model ?? process.env.CEREBRAS_MODEL ?? "llama-3.3-70b",
-    visionModel:
-      process.env.CEREBRAS_VISION_MODEL ?? "llama-4-scout-17b-16e-instruct",
+    // gpt-oss-120b: strong reasoning model, clean JSON + clean streamed content
+    // (reasoning lands in a separate field). Override with CEREBRAS_MODEL.
+    model: model ?? process.env.CEREBRAS_MODEL ?? "gpt-oss-120b",
+    // This account has no vision model; vision falls through to a vision-capable
+    // provider in the chain (e.g. Groq llama-4-scout) when configured.
+    visionModel: process.env.CEREBRAS_VISION_MODEL,
   };
   return createOAIProvider(`cerebras:${cfg.model}`, cfg);
 }

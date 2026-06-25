@@ -37,7 +37,8 @@ export async function oaiJson(
       { role: "user", content: userContent },
     ],
     temperature: 0.4,
-    max_tokens: 800,
+    // Headroom for reasoning models (gpt-oss) that spend tokens before the JSON.
+    max_tokens: 1500,
   };
   // Vision models often reject response_format; rely on the prompt + tolerant parser.
   if (!useVision) payload.response_format = { type: "json_object" };
@@ -81,7 +82,7 @@ export async function* oaiStream(
         { role: "user", content: user },
       ],
       temperature: 0.6,
-      max_tokens: 600,
+      max_tokens: 1000,
       stream: true,
     }),
     signal: AbortSignal.timeout(20000),
