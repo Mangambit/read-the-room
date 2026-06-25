@@ -14,13 +14,13 @@ import { AGE_LABEL } from "./schema";
  */
 const AGE_GUIDE: Record<Age, string> = {
   middle:
-    "Mostly lowercase, almost no punctuation. A period at the end, or full capitalization, reads as serious or mad. 'k' / 'ok.' is cold or dismissive. Heavy current slang (fr, ngl, lowkey, bruh, it's giving). 💀 and 😭 mean 'laughing,' not death/crying. Short, fast, meme-y.",
+    "All lowercase incl 'i'; capitals/periods feel intense. A period on a short reply reads cold/mad — 'ok'=neutral, 'ok.'=annoyed, 'k'=dismissive, 'okk/okayyy'=warm. Elongation ('soooo','plsss')=warmth; ALL CAPS=real yelling. 💀 and 😭 mean laughing (NOT 😂, which reads old); a 👍 reads dismissive. Slang is light and often ironic (fr, ngl, lowkey, bruh, no cap) — never stacked sincerely; skibidi/sigma/gyatt/'6-7'/slay are dead or mock-only. 'lol/haha' are softeners ('I'm not mad'); real anger is the ABSENCE of softeners — short, bare, punctuated.",
   high:
-    "Lowercase by default; a period reads passive-aggressive. 'lol/lmao' often soften rather than mean real laughter. Slang like 'no cap,' 'fr fr,' 'mid,' 'ate,' 'delulu.' 💀😭 = laughing. Casual but a bit more self-aware than middle school.",
+    "Lowercase default, thoughts split across bubbles, period=cold/passive-aggressive. 'okay'=warm, 'ok'=flat, 'ok.'=cold, 'k'=dismissive, 'kk'=friendly. Caps for emotion ('i CANNOT','HELP'), '…'=judgment. 💀/😭=laughing (😂=old tell); 🥀=ironic despair; 🙂 and 👍 read passive-aggressive. About ONE slang token per message, often ironic (crash out, cooked, lock in, yap, mid, the ick, deadass, 'so real', ngl/tbh/istg/iykyk); avoid sincere skibidi/gyatt/sigma/'6-7'/'no cap'(dated). 'lol' is tonal glue; passive-aggression = a period on a positive line, '…', or 'no it's fine'.",
   college:
-    "Gen Z casual but can switch to full, coherent sentences when it matters. Irony-heavy; 'honestly,' 'literally,' 'i'm crying' (= laughing). Lowercase with friends, tactical emoji. Reads dryness/curtness as a real signal.",
+    "Lowercase as a softener; caps only for emphasis ('i am NOT') or sincerity. Period=cold/serious; 'fine'/'fineee'/'fine.' are three different moods. 'k'=maximally cold, 'kk'=warm; 'lol' defuses and its ABSENCE signals anger. 💀/😭=laughing (😂=old), 👍=passive-aggressive, 🙂=fake smile, 🫡=resigned. Slang carries an ironic/meta layer (it's giving, delulu, bestie/bruh, lowkey, valid/based/cooked, 'respectfully', 'not me ___') — never 4+ stacked. Hard rule: register-switch by recipient — loose to a friend, fully formal with zero slang/emoji to a professor. 'Upset but won't say it' = 'it's fine'/'no worries'/sudden formality + brevity.",
   adult:
-    "Normal capitalization and punctuation — a period is NOT cold here. 'lol/haha,' sincere emoji (🙂😂👍), mostly complete sentences, polite. Passive-aggression shows through formality ('per my last email,' 'no worries,' a clipped 'K.'). Don't use teen slang.",
+    "Warmth shows through EFFORT: proper capitalization, punctuation, and exclamation points ('Sounds good!','No worries!') — a trailing period is NEUTRAL here, not cold. Full words over abbreviations; sincere end-emoji (🙂😊👍, 😂 for laughing). Do NOT use teen slang — stacking current slang reads as 'a millennial doing a bit'. Register: loose with friends (lol/haha/omg), polite at work ('Just following up','Will do!'), warmest with family. Curtness/passive-aggression = DROPPING the exclamation/emoji and going short ('Ok.','Noted.','Per my last email.'); 'upset but won't say it' = politeness escalates while warmth drops ('Okay. That's fine. Thanks.').",
 };
 
 function ageReadLine(age?: Age): string {
@@ -49,6 +49,7 @@ const QUALITY_RULES = `How to read well:
 - Say the real thing plainly. Cut ALL hedging filler: no "a bit", "a little", "perhaps", "possibly", "slightly", "kind of", "it seems like", "might be". When you're confident, state it flat ("This is a guilt-trip."). When it's genuinely ambiguous, name the two most likely readings outright — don't soften one read into a "possibly".
 - Don't manufacture drama. For a very short, neutral, or genuinely warm message, it's more honest to say there's little subtext and keep confidence low than to invent a hidden motive the words don't support.
 - No therapy-speak, no corporate tone, no clichés. Sound like a sharp, warm human.
+- Read tone as DEVIATION from how this person normally texts: a period, curtness, fewer emoji, or suddenly going formal are signals mainly when they depart from the sender's usual style. Punctuation and emoji are age-conditioned — a trailing period or a 👍 reads cold/dismissive from a teen but neutral/sincere from an adult; 💀/😭 mean "laughing" for younger texters, 😂 for older ones. Don't over-read a single mark.
 - "wants" is the reader's concrete next move, not a vague feeling.`;
 
 function senderLine(sender?: string): string {
