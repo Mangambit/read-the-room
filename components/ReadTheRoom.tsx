@@ -1,9 +1,35 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Age, DecodeResult, PreSendResult, Sender } from "@/lib/schema";
 import { AGES, AGE_LABEL } from "@/lib/schema";
 import { SAMPLES } from "@/lib/demo-data";
+
+/** Downscale a picked image to a small JPEG data URL (keeps the request tiny). */
+function downscaleImage(file: File, maxW = 1100, quality = 0.82): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const scale = Math.min(1, maxW / img.width);
+        const w = Math.round(img.width * scale);
+        const h = Math.round(img.height * scale);
+        const canvas = document.createElement("canvas");
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return reject(new Error("no canvas context"));
+        ctx.drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL("image/jpeg", quality));
+      };
+      img.onerror = reject;
+      img.src = reader.result as string;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
 import { DecodeResultView } from "@/components/decode/DecodeResultView";
 import { ReplyDrafts } from "@/components/decode/ReplyDrafts";
 import { SafetyBanner } from "@/components/decode/SafetyBanner";
@@ -39,7 +65,7 @@ const COPY: Record<
     placeholder: "e.g. “Per my last email, the assignment was due Friday…”",
     sender: "Who’s it from?",
     cta: "Read the room",
-    hint: "One message or a whole back-and-forth — paste it all.",
+    hint: "One message, a whole back-and-forth, or a screenshot — whatever you've got.",
   },
   presend: {
     label: "Paste the reply you’re about to send",
@@ -60,7 +86,21 @@ export function ReadTheRoom() {
     message: string;
     sender?: Sender;
     age?: Age;
+    image?: string;
   } | null>(null);
+  const [image, setImage] = useState<string | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  async function onPickImage(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    try {
+      setImage(await downscaleImage(file));
+    } catch {
+      setError("Couldn't read that image — try another one.");
+    }
+  }
   const [presend, setPresend] = useState<PreSendResult | null>(null);
   const [isDemo, setIsDemo] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -102,10 +142,11 @@ export function ReadTheRoom() {
     setMode(next);
     setText("");
     setSender(null);
+    setImage(null);
     reset();
   }
 
-  async function runDecode(msg: string, snd: Sender | null) {
+  async function runDecode(msg: string, snd: Sender | null, img: string | null) {
     setStatus("loading");
     setError(null);
     setResult(null);
@@ -116,6 +157,7 @@ export function ReadTheRoom() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           message: msg,
+          image: img ?? undefined,
           sender: snd ?? undefined,
           age: age ?? undefined,
         }),
@@ -127,7 +169,12 @@ export function ReadTheRoom() {
         return;
       }
       setResult(data.result);
-      setDecoded({ message: msg, sender: snd ?? undefined, age: age ?? undefined });
+      setDecoded({
+        message: msg,
+        sender: snd ?? undefined,
+        age: age ?? undefined,
+        image: img ?? undefined,
+      });
       setIsDemo(data.demo);
       setStatus("done");
     } catch {
@@ -168,8 +215,9 @@ export function ReadTheRoom() {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (text.trim().length === 0) return;
-    if (mode === "decode") runDecode(text, sender);
+    const hasImage = mode === "decode" && Boolean(image);
+    if (text.trim().length === 0 && !hasImage) return;
+    if (mode === "decode") runDecode(text, sender, image);
     else runPresend(text, sender);
   }
 
@@ -178,10 +226,13 @@ export function ReadTheRoom() {
     if (!sample) return;
     setText(sample.message);
     setSender(sample.sender);
-    runDecode(sample.message, sample.sender);
+    setImage(null);
+    runDecode(sample.message, sample.sender, null);
   }
 
-  const canSubmit = text.trim().length > 0 && status !== "loading";
+  const canSubmit =
+    (text.trim().length > 0 || (mode === "decode" && Boolean(image))) &&
+    status !== "loading";
   const copy = COPY[mode];
 
   return (
@@ -271,6 +322,43 @@ export function ReadTheRoom() {
           <p className="mt-2 text-xs text-ink-faint">{copy.hint}</p>
         )}
 
+        {mode === "decode" && (
+          <div className="mt-3">
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/*"
+              onChange={onPickImage}
+              className="hidden"
+            />
+            {image ? (
+              <div className="flex items-center gap-3">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={image}
+                  alt="Screenshot to decode"
+                  className="h-16 w-auto rounded-lg border border-line"
+                />
+                <button
+                  type="button"
+                  onClick={() => setImage(null)}
+                  className="rounded-chip border border-line bg-paper px-3 py-1 text-sm text-ink-soft transition hover:border-rose"
+                >
+                  Remove screenshot
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => fileRef.current?.click()}
+                className="rounded-chip border border-line bg-paper px-3 py-1.5 text-sm text-ink-soft transition hover:-translate-y-px hover:border-rose hover:text-ink"
+              >
+                📷 Add a screenshot
+              </button>
+            )}
+          </div>
+        )}
+
         <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <fieldset>
             <legend className="text-[0.7rem] font-bold uppercase tracking-[0.16em] text-ink-faint">
@@ -356,7 +444,11 @@ export function ReadTheRoom() {
           {mode === "decode" && result && (
             <>
               {result.crisisFlag && <SafetyBanner />}
-              <DecodeResultView result={result} message={decoded?.message ?? ""} />
+              <DecodeResultView
+                result={result}
+                message={decoded?.message ?? ""}
+                image={decoded?.image}
+              />
               {decoded && !result.crisisFlag && (
                 <ReplyDrafts
                   key={decoded.message}

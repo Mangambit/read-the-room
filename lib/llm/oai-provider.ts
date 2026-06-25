@@ -19,7 +19,9 @@ export function createOAIProvider(name: string, cfg: OAIConfig): LlmProvider {
     name,
     isDemo: false,
     async decode(input) {
-      return parseDecode(await oaiJson(cfg, DECODE_SYSTEM, decodeUser(input)));
+      return parseDecode(
+        await oaiJson(cfg, DECODE_SYSTEM, decodeUser(input), input.image),
+      );
     },
     reply(input) {
       return oaiStream(cfg, replySystem(input.tone), replyUser(input));

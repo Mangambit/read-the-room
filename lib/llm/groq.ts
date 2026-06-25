@@ -17,6 +17,9 @@ export function createGroqProvider(apiKey?: string, model?: string): LlmProvider
     baseUrl: "https://api.groq.com/openai/v1",
     apiKey: key,
     model: model ?? process.env.GROQ_MODEL ?? "llama-3.3-70b-versatile",
+    visionModel:
+      process.env.GROQ_VISION_MODEL ??
+      "meta-llama/llama-4-scout-17b-16e-instruct",
   };
   return createOAIProvider(`groq:${cfg.model}`, cfg);
 }

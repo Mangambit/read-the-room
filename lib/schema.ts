@@ -107,7 +107,10 @@ export const PreSendResultSchema = z.object({
 export type PreSendResult = z.infer<typeof PreSendResultSchema>;
 
 export interface DecodeInput {
+  /** The message text. May be empty when an image is provided. */
   message: string;
+  /** Optional screenshot of a conversation, as a data URL, for extra context. */
+  image?: string;
   sender?: Sender;
   age?: Age;
 }

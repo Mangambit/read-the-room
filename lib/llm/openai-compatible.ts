@@ -7,36 +7,49 @@ export interface OAIConfig {
   baseUrl: string; // e.g. https://api.groq.com/openai/v1
   apiKey: string;
   model: string;
+  visionModel?: string; // used when an image is supplied
 }
 
-interface Msg {
-  role: "system" | "user" | "assistant";
-  content: string;
-}
-
-/** One-shot call that asks for a JSON object. Returns the raw content string. */
+/**
+ * One-shot call that asks for a JSON object. Returns the raw content string.
+ * If `image` (a data URL) is given, routes to the vision model and sends the
+ * image as a content part.
+ */
 export async function oaiJson(
   cfg: OAIConfig,
   system: string,
   user: string,
+  image?: string,
 ): Promise<string> {
+  const useVision = Boolean(image);
+  const model = useVision ? (cfg.visionModel ?? cfg.model) : cfg.model;
+  const userContent = useVision
+    ? [
+        { type: "text", text: user },
+        { type: "image_url", image_url: { url: image } },
+      ]
+    : user;
+
+  const payload: Record<string, unknown> = {
+    model,
+    messages: [
+      { role: "system", content: system },
+      { role: "user", content: userContent },
+    ],
+    temperature: 0.4,
+    max_tokens: 800,
+  };
+  // Vision models often reject response_format; rely on the prompt + tolerant parser.
+  if (!useVision) payload.response_format = { type: "json_object" };
+
   const res = await fetch(`${cfg.baseUrl}/chat/completions`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${cfg.apiKey}`,
     },
-    body: JSON.stringify({
-      model: cfg.model,
-      messages: [
-        { role: "system", content: system },
-        { role: "user", content: user },
-      ] satisfies Msg[],
-      response_format: { type: "json_object" },
-      temperature: 0.4,
-      max_tokens: 800,
-    }),
-    signal: AbortSignal.timeout(15000),
+    body: JSON.stringify(payload),
+    signal: AbortSignal.timeout(useVision ? 30000 : 15000),
   });
 
   if (!res.ok) {
@@ -66,7 +79,7 @@ export async function* oaiStream(
       messages: [
         { role: "system", content: system },
         { role: "user", content: user },
-      ] satisfies Msg[],
+      ],
       temperature: 0.6,
       max_tokens: 600,
       stream: true,

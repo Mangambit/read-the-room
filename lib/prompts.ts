@@ -98,6 +98,15 @@ ${DECODE_EXAMPLES}
 ${DECODE_SHAPE}`;
 
 export function decodeUser(input: DecodeInput): string {
+  if (input.image) {
+    const extra = input.message.trim()
+      ? `\nExtra context from the reader: ${input.message}`
+      : "";
+    return `The reader uploaded a SCREENSHOT of a conversation.${senderLine(input.sender)}${ageReadLine(input.age)}
+Read the conversation in the image. Decode the latest / most important message the READER received — the one they're trying to understand — in the context of the rest. Each "tells" quote must be copied verbatim from text visible in the screenshot.${extra}
+
+Return the JSON object now.`;
+  }
   return `Message the reader received:${senderLine(input.sender)}${ageReadLine(input.age)}
 """
 ${input.message}

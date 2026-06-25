@@ -17,11 +17,16 @@ export function OPTIONS() {
   return new Response(null, { status: 204, headers: CORS });
 }
 
-const BodySchema = z.object({
-  message: z.string().min(1).max(4000),
-  sender: z.enum(SENDERS).optional(),
-  age: z.enum(AGES).optional(),
-});
+const BodySchema = z
+  .object({
+    message: z.string().max(4000).default(""),
+    image: z.string().max(4_000_000).optional(), // data URL of a screenshot
+    sender: z.enum(SENDERS).optional(),
+    age: z.enum(AGES).optional(),
+  })
+  .refine((b) => b.message.trim().length > 0 || Boolean(b.image), {
+    message: "Provide a message or a screenshot.",
+  });
 
 export async function POST(req: NextRequest) {
   if (!rateLimit(clientIp(req))) {

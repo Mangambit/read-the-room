@@ -6,6 +6,7 @@ import type { DecodeResult, Upset, Urgency } from "@/lib/schema";
 type Props = {
   result: DecodeResult;
   message: string;
+  image?: string;
 };
 
 const UPSET_LABEL: Record<Upset, string> = {
@@ -50,7 +51,7 @@ function Eyebrow({
   );
 }
 
-export function DecodeResultView({ result, message }: Props) {
+export function DecodeResultView({ result, message, image }: Props) {
   const { tells } = result;
   const hasTells = tells.length > 0;
   const [hovered, setHovered] = useState<number | null>(null);
@@ -109,11 +110,21 @@ export function DecodeResultView({ result, message }: Props) {
         className="animate-rise rounded-card border border-line bg-paper-raised p-5 shadow-soft sm:p-6"
         style={{ animationDelay: "0ms" }}
       >
-        <Eyebrow>Their message</Eyebrow>
-        <p className="mt-2 text-[1.05rem] leading-relaxed text-ink">
-          {highlightedMessage()}
-        </p>
-        {hasTells && (
+        <Eyebrow>{image ? "Your screenshot" : "Their message"}</Eyebrow>
+        {image && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={image}
+            alt="The conversation you decoded"
+            className="mt-2 max-h-80 w-auto rounded-xl border border-line"
+          />
+        )}
+        {message.trim().length > 0 && (
+          <p className="mt-2 text-[1.05rem] leading-relaxed text-ink">
+            {highlightedMessage()}
+          </p>
+        )}
+        {hasTells && message.trim().length > 0 && (
           <p className="mt-2 text-xs text-ink-faint">
             Hover a highlight to see what gave it away ↓
           </p>
