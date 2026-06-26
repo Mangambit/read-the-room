@@ -5,10 +5,11 @@
  * it works on Gmail, Discord, Outlook, anywhere. Styles live in a shadow root
  * so the host page can't break them (and we can't break the host page).
  *
- * Set API_BASE to your deployed URL after you ship (it defaults to local dev).
+ * API_BASE points at the live deployment so the extension works the moment it's
+ * loaded — no local server needed. Swap to http://localhost:3000 for dev.
  */
 (function () {
-  const API_BASE = "http://localhost:3000";
+  const API_BASE = "https://read-the-room-phi.vercel.app";
 
   // Read the Room palette (kept in sync with the app's design tokens).
   const C = {
@@ -16,7 +17,7 @@
     sunk: "#e3dfd9",
     ink: "#262329",
     inkSoft: "#5f5a63",
-    inkFaint: "#8b8690",
+    inkFaint: "#635e68",
     line: "#ded9d3",
     plum: "#3a2a4d",
     plumRaised: "#46355a",
@@ -26,7 +27,7 @@
     roseInk: "#a23a6b",
     heat: "#b8443f",
     calm: "#3f7d66",
-    caution: "#bf8526",
+    caution: "#855d12",
   };
 
   let chip = null;

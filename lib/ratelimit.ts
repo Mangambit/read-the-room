@@ -8,9 +8,12 @@ const WINDOW_MS = 60_000;
 const MAX_PER_WINDOW = 25;
 
 const hits = new Map<string, { count: number; reset: number }>();
+// Backstop so the Map can't grow without bound on a long-lived instance.
+const MAX_TRACKED_IPS = 5000;
 
 export function rateLimit(ip: string): boolean {
   const now = Date.now();
+  if (hits.size > MAX_TRACKED_IPS) hits.clear();
   const entry = hits.get(ip);
   if (!entry || now > entry.reset) {
     hits.set(ip, { count: 1, reset: now + WINDOW_MS });
@@ -22,7 +25,12 @@ export function rateLimit(ip: string): boolean {
 }
 
 export function clientIp(req: Request): string {
+  // On Vercel the trusted client IP is the LAST hop appended by the edge; the
+  // leftmost XFF value is client-controlled and trivially spoofable.
   const xff = req.headers.get("x-forwarded-for");
-  if (xff) return xff.split(",")[0].trim();
+  if (xff) {
+    const parts = xff.split(",");
+    return parts[parts.length - 1].trim();
+  }
   return req.headers.get("x-real-ip") ?? "local";
 }

@@ -11,8 +11,8 @@
     }
   ],
   "host_permissions": [
-    "http://localhost:3000/*",
-    "https://*.vercel.app/*"
+    "https://read-the-room-phi.vercel.app/*",
+    "http://localhost:3000/*"
   ],
   "action": {
     "default_title": "Read the Room — select text on any page to decode it"

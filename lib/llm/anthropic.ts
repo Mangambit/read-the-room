@@ -36,6 +36,7 @@ async function claudeJson(system: string, user: string): Promise<string> {
       system,
       messages: [{ role: "user", content: user }],
     }),
+    signal: AbortSignal.timeout(15000),
   });
   if (!res.ok) {
     const body = await res.text().catch(() => "");
@@ -76,6 +77,7 @@ async function* claudeStream(
       messages: [{ role: "user", content: user }],
       stream: true,
     }),
+    signal: AbortSignal.timeout(20000),
   });
   if (!res.ok || !res.body) {
     const body = await res.text().catch(() => "");
