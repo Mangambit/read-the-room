@@ -16,8 +16,14 @@ Everything below is copy-paste ready. Fill the Devpost form field-by-field.
 ## Project name
 Read the Room
 
-## Tagline / elevator pitch (≤ ~200 chars)
-The friend who finally explains what they actually meant. Paste any confusing message and get the tone, the hidden ask, and a reply — in plain language. Built for neurodivergent minds; useful for everyone.
+## Elevator pitch (panel-refined — Problem → Solution → Kicker; ~120 words)
+You've reread that text five times and still can't tell — are they mad at you, or is it just you? For a lot of us, especially if you're neurodivergent, subtext doesn't arrive automatically, and one unclear message can eat a whole evening of overthinking.
+
+Read the Room reads it for you. Paste a confusing message and it tells you, in plain words, what they really mean — the tone, whether it's aimed at you, what they want — and highlights the exact words that gave it away. Then it drafts your reply (warm, professional, or firm), or checks the one you're about to send. For the messages that aren't fine at all, there's a quiet crisis safety net.
+
+It's the friend who finally explains what they meant — built for neurodivergent minds, with accessibility baked in. Useful for everyone.
+
+> One-line tagline (if a separate short field needs it): "The friend who finally explains what they actually meant."
 
 ## Tracks / category
 Track 03 — AI That Actually Helps People
